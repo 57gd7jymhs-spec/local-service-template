@@ -1,0 +1,78 @@
+---
+import { client } from '../../config/client';
+import '../../styles/global.css';
+import PageLoader from './PageLoader.astro';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = client.seo.title,
+  description = client.seo.description,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang={client.seo.locale}>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={client.seo.ogImage} />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet" />
+
+  <!-- Inject client theme as CSS variables -->
+  <style define:vars={{
+    'client-primary': client.theme.primary,
+    'client-navy':    client.theme.navy,
+    'client-ink':     client.theme.ink,
+    'client-bg':      client.theme.bg,
+    'client-surface': client.theme.surface,
+    'client-border':  client.theme.border,
+    'client-radius':  client.theme.radius,
+  }}>
+    :root {
+      --blue:    var(--client-primary);
+      --navy:    var(--client-navy);
+      --ink:     var(--client-ink);
+      --bg:      var(--client-bg);
+      --surface: var(--client-surface);
+      --border:  var(--client-border);
+      --radius:  var(--client-radius);
+    }
+    * { font-family: 'Inter', sans-serif; }
+  </style>
+
+  <!-- Ring radius must be set before animation fires -->
+  <script>
+    document.documentElement.style.setProperty(
+      '--ld-ring-max-r',
+      Math.ceil(Math.hypot(window.innerWidth / 2, window.innerHeight / 2) * 1.15) + 'px'
+    );
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+  </script>
+</head>
+<body>
+  <PageLoader brandName={client.brand.name} tagline={client.brand.tagline} logo={client.brand.logoNegative} />
+  <Header
+    brandName={client.brand.name}
+    phone={client.brand.phone}
+    logo={client.brand.logo}
+  />
+  <main>
+    <slot />
+  </main>
+  <Footer />
+</body>
+</html>

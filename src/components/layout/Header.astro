@@ -1,0 +1,85 @@
+---
+import { client } from '../../config/client';
+
+interface Props {
+  brandName: string;
+  phone: string;
+  logo: string;
+}
+const { brandName, phone, logo } = Astro.props;
+---
+
+<style>
+  .nav-wrap {
+    position: fixed; top: 1rem; left: 50%; transform: translateX(-50%);
+    z-index: 1000; width: calc(100% - 2rem); max-width: 1200px;
+  }
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .75rem 1.25rem;
+    background: rgba(255,255,255,.12);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 1rem;
+    transition: background .3s, border-color .3s, box-shadow .3s;
+  }
+  nav.scrolled {
+    background: var(--navy);
+    border-color: transparent;
+    box-shadow: 0 8px 32px rgba(13,30,92,.35);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: .625rem;
+    text-decoration: none; color: #fff; font-weight: 800; font-size: 1.1rem;
+  }
+  .nav-logo img { width: 32px; height: 32px; border-radius: .5rem; object-fit: contain; }
+  .nav-links {
+    display: flex; gap: 2rem; list-style: none; margin: 0; padding: 0;
+  }
+  .nav-links a {
+    color: rgba(255,255,255,.85); text-decoration: none; font-size: .9rem; font-weight: 500;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: #fff; }
+  .btn-phone {
+    display: flex; align-items: center; gap: .5rem;
+    background: var(--blue); color: #fff;
+    padding: .6rem 1.1rem; border-radius: .625rem;
+    font-size: .875rem; font-weight: 700; text-decoration: none;
+    transition: background .2s, transform .15s;
+    white-space: nowrap;
+  }
+  .btn-phone:hover { background: #0f35c4; transform: translateY(-1px); }
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .btn-phone span.label { display: none; }
+  }
+</style>
+
+<div class="nav-wrap">
+  <nav id="main-nav">
+    <a href="/" class="nav-logo">
+      <img src={logo} alt={brandName} />
+      {brandName}
+    </a>
+    <ul class="nav-links">
+      <li><a href="/diensten">Diensten</a></li>
+      {client.testimonials.length > 0 && <li><a href="/#reviews">Reviews</a></li>}
+      <li><a href="/over-ons">Over ons</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+    <a href={`tel:${phone.replace(/\s/g,'')}`} class="btn-phone">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+      </svg>
+      <span class="label">{phone}</span>
+    </a>
+  </nav>
+</div>
+
+<script>
+  const nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', () => {
+    nav?.classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
+</script>

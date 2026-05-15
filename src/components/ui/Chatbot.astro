@@ -1,0 +1,175 @@
+---
+import { client } from '../../config/client';
+if (!client.ai.enabled) return;
+---
+
+<style>
+  #faq-btn {
+    position: fixed; bottom: 24px; right: 24px; z-index: 9000;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--blue); color: #fff; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 24px rgba(24,71,237,.45);
+    transition: transform .2s, box-shadow .2s;
+  }
+  #faq-btn:hover { transform: scale(1.08); box-shadow: 0 12px 32px rgba(24,71,237,.6); }
+  #faq-panel {
+    position: fixed; bottom: 88px; right: 24px; z-index: 9000;
+    width: 360px; max-height: 520px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 1.25rem; box-shadow: 0 24px 64px rgba(0,0,0,.18);
+    display: flex; flex-direction: column; overflow: hidden;
+    opacity: 0; transform: scale(.95) translateY(8px);
+    pointer-events: none;
+    transition: opacity .25s var(--ease), transform .25s var(--ease);
+  }
+  #faq-panel.open { opacity: 1; transform: none; pointer-events: all; }
+  .panel-header {
+    background: var(--navy); color: #fff;
+    padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .panel-header-info { display: flex; align-items: center; gap: .625rem; }
+  .panel-avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--blue);
+    display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 800;
+  }
+  .panel-name { font-size: .875rem; font-weight: 700; }
+  .panel-status { font-size: .7rem; color: rgba(255,255,255,.55); }
+  #faq-close { background: none; border: none; color: rgba(255,255,255,.6); cursor: pointer; padding: .25rem; border-radius: .375rem; }
+  #faq-close:hover { color: #fff; }
+  #faq-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: .75rem; }
+  .msg { max-width: 85%; padding: .625rem .875rem; border-radius: 1rem; font-size: .875rem; line-height: 1.5; }
+  .msg-bot { background: var(--bg); color: var(--ink); border-radius: 1rem 1rem 1rem .25rem; align-self: flex-start; }
+  .msg-user { background: var(--blue); color: #fff; border-radius: 1rem 1rem .25rem 1rem; align-self: flex-end; }
+  .typing { display: flex; gap: .3rem; align-items: center; padding: .625rem .875rem; }
+  .typing span { width: 6px; height: 6px; background: var(--muted); border-radius: 50%; animation: blink 1.2s infinite; }
+  .typing span:nth-child(2) { animation-delay: .2s; }
+  .typing span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%,80%,100%{opacity:.2}40%{opacity:1} }
+  .msg-cta {
+    display: inline-flex; align-items: center; gap: .4rem; margin-top: .5rem;
+    background: var(--blue); color: #fff; text-decoration: none;
+    padding: .45rem .875rem; border-radius: .5rem; font-size: .8rem; font-weight: 700;
+  }
+  #faq-form { display: flex; gap: .5rem; padding: .75rem; border-top: 1px solid var(--border); flex-shrink: 0; }
+  #faq-input {
+    flex: 1; border: 1px solid var(--border); border-radius: .625rem;
+    padding: .55rem .875rem; font-size: 16px; outline: none;
+    transition: border-color .2s;
+  }
+  #faq-input:focus { border-color: var(--blue); }
+  #faq-send {
+    background: var(--blue); color: #fff; border: none; cursor: pointer;
+    width: 38px; height: 38px; border-radius: .625rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s;
+  }
+  #faq-send:hover { background: #0f35c4; }
+
+  @media (max-width: 640px) {
+    #faq-panel {
+      position: fixed; inset: 0; width: 100%; height: 100dvh;
+      max-height: none; border-radius: 0; bottom: unset; right: unset;
+      opacity: 1; transform: translateY(100%);
+      transition: transform .35s var(--ease);
+    }
+    #faq-panel.open { transform: translateY(0); }
+    #faq-btn { bottom: 16px; right: 16px; }
+  }
+</style>
+
+<button id="faq-btn" aria-label="Chat openen" aria-expanded="false">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</button>
+
+<div id="faq-panel" role="dialog" aria-label="Chat" aria-modal="true">
+  <div class="panel-header">
+    <div class="panel-header-info">
+      <div class="panel-avatar">AI</div>
+      <div>
+        <div class="panel-name">{client.brand.name}</div>
+        <div class="panel-status">Online — antwoordt direct</div>
+      </div>
+    </div>
+    <button id="faq-close" aria-label="Sluiten">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div id="faq-messages">
+    <div class="msg msg-bot">Hallo! Ik ben de digitale assistent van {client.brand.name}. Hoe kan ik u helpen? 👋</div>
+  </div>
+  <form id="faq-form">
+    <input id="faq-input" type="text" placeholder="Stel uw vraag..." autocomplete="off" />
+    <button id="faq-send" type="submit" aria-label="Versturen">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </form>
+</div>
+
+<script define:vars={{ phone: client.brand.phone }}>
+  const btn = document.getElementById('faq-btn');
+  const panel = document.getElementById('faq-panel');
+  const closeBtn = document.getElementById('faq-close');
+  const form = document.getElementById('faq-form');
+  const input = document.getElementById('faq-input');
+  const messages = document.getElementById('faq-messages');
+  const history = [];
+
+  function open() { panel.classList.add('open'); btn.setAttribute('aria-expanded','true'); input.focus(); }
+  function close() { panel.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
+  btn.addEventListener('click', () => panel.classList.contains('open') ? close() : open());
+  closeBtn.addEventListener('click', close);
+
+  function addMsg(text, role, showCta = false) {
+    const el = document.createElement('div');
+    el.className = `msg msg-${role === 'user' ? 'user' : 'bot'}`;
+    el.textContent = text;
+    if (showCta) {
+      const cta = document.createElement('div');
+      cta.style.marginTop = '.5rem';
+      const a = document.createElement('a');
+      a.href = `tel:${phone.replace(/\s/g,'')}`;
+      a.className = 'msg-cta';
+      a.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg> Bel direct`;
+      cta.appendChild(a); el.appendChild(cta);
+    }
+    messages.appendChild(el);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function showTyping() {
+    const el = document.createElement('div');
+    el.className = 'msg msg-bot typing'; el.id = 'typing';
+    el.innerHTML = '<span></span><span></span><span></span>';
+    messages.appendChild(el); messages.scrollTop = messages.scrollHeight;
+    return el;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    addMsg(text, 'user');
+    history.push({ role: 'user', content: text });
+    const typing = showTyping();
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history }),
+      });
+      const data = await res.json();
+      typing.remove();
+      const reply = data.reply || 'Er ging iets mis. Bel ons gerust direct.';
+      history.push({ role: 'assistant', content: reply });
+      addMsg(reply, 'bot', true);
+    } catch {
+      typing.remove();
+      addMsg('Er ging iets mis. Bel ons gerust direct.', 'bot', true);
+    }
+  });
+</script>

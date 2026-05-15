@@ -1,0 +1,47 @@
+---
+interface Props {
+  brandName: string;
+  tagline: string;
+  logo: string;
+}
+const { brandName, tagline, logo } = Astro.props;
+---
+
+<div id="page-loader" aria-hidden="true">
+  <div class="ld-drop">
+    <svg width="30" height="44" viewBox="0 0 30 44" fill="none">
+      <path d="M15 2C15 2 1 18 1 29A14 14 0 0 0 29 29C29 18 15 2 15 2Z" fill="white"/>
+    </svg>
+  </div>
+  <svg class="ld-rings-svg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle class="ld-rc ld-rc-1" cx="50%" cy="50%" r="12"/>
+    <circle class="ld-rc ld-rc-2" cx="50%" cy="50%" r="12"/>
+    <circle class="ld-rc ld-rc-3" cx="50%" cy="50%" r="12"/>
+  </svg>
+  <div class="ld-logo-pos">
+    <div class="ld-logo-wrap">
+      <img src={logo} alt={brandName} />
+    </div>
+  </div>
+  <div class="loader-wordmark">
+    {brandName} <span>{tagline}</span>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const loader = document.getElementById('page-loader');
+    if (!loader) return;
+    function dismiss() {
+      window.scrollTo(0, 0);
+      loader!.classList.add('hide');
+      setTimeout(() => { loader!.remove(); window.scrollTo(0, 0); }, 900);
+    }
+    const minWait = new Promise<void>(r => setTimeout(r, 2800));
+    const pageReady = new Promise<void>(r => {
+      if (document.readyState === 'complete') r();
+      else window.addEventListener('load', () => r(), { once: true });
+    });
+    Promise.all([minWait, pageReady]).then(dismiss);
+  })();
+</script>

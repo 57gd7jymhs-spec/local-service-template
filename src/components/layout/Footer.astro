@@ -1,0 +1,62 @@
+---
+import { client } from '../../config/client';
+---
+
+<style>
+  footer {
+    background: var(--navy); color: rgba(255,255,255,.7);
+    padding: 3rem 1.5rem 2rem; font-size: .875rem;
+  }
+  .footer-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr auto auto; gap: 3rem;
+    align-items: start;
+  }
+  .footer-brand { color: #fff; font-weight: 800; font-size: 1.1rem; margin-bottom: .5rem; }
+  .footer-meta { color: rgba(255,255,255,.45); font-size: .8rem; margin-top: 1rem; }
+  .footer-col h4 { color: #fff; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .75rem; }
+  .footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .5rem; }
+  .footer-col a { color: rgba(255,255,255,.6); text-decoration: none; transition: color .2s; }
+  .footer-col a:hover { color: #fff; }
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,.08); margin: 2rem 0 1rem; }
+  .footer-bottom {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+  }
+  @media (max-width: 640px) {
+    .footer-inner { grid-template-columns: 1fr; gap: 1.5rem; }
+    .footer-bottom { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">{client.brand.name}</div>
+      <div>{client.brand.location}</div>
+      <div>{client.footer.hours}</div>
+      <a href={`tel:${client.brand.phone.replace(/\s/g,'')}`} style="color:rgba(255,255,255,.9); margin-top:.5rem; display:block;">{client.brand.phone}</a>
+    </div>
+    <div class="footer-col">
+      <h4>Navigatie</h4>
+      <ul>
+        {client.footer.links.map(l => (
+          <li><a href={l.href}>{l.label}</a></li>
+        ))}
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Info</h4>
+      <ul>
+        {client.footer.legal.map(l => (
+          <li><a href={l.href}>{l.label}</a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+  <hr class="divider" />
+  <div class="footer-bottom">
+    <span>{client.footer.copyright}</span>
+    <span style="color:rgba(255,255,255,.3); font-size:.75rem;">Gebouwd met ♥ voor lokale vakmensen</span>
+  </div>
+</footer>

@@ -1,0 +1,40 @@
+---
+import { client } from '../../../config/client';
+---
+<style>
+  .hero-minimal {
+    min-height: 100dvh; display: flex; align-items: center; justify-content: center;
+    background: var(--navy); color: #fff; text-align: center;
+    padding: 6rem 2rem 4rem;
+  }
+  .inner { max-width: 720px; }
+  .trust-badge {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+    border-radius: 2rem; padding: .375rem .875rem; font-size: .8rem; font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+  .badge-dot { width: 7px; height: 7px; background: #22c55e; border-radius: 50%; }
+  h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 900; line-height: 1.05; letter-spacing: -.04em; margin: 0 0 1.25rem; }
+  .accent { color: var(--blue); }
+  p { color: rgba(255,255,255,.7); font-size: 1.1rem; line-height: 1.65; margin: 0 0 2.5rem; }
+  .btn {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: var(--blue); color: #fff; padding: 1rem 2rem;
+    border-radius: .75rem; font-size: 1.05rem; font-weight: 700; text-decoration: none;
+    box-shadow: 0 8px 24px rgba(24,71,237,.4); transition: background .2s, transform .15s;
+  }
+  .btn:hover { background: #0f35c4; transform: translateY(-2px); }
+</style>
+
+<section class="hero-minimal">
+  <div class="inner">
+    <div class="trust-badge"><span class="badge-dot"></span>{client.hero.trustBadge}</div>
+    <h1>{client.hero.headline} <span class="accent">{client.hero.rotatingWords[0]}</span></h1>
+    <p>{client.hero.subtext}</p>
+    <a href={`tel:${client.brand.phone.replace(/\s/g,'')}`} class="btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      {client.hero.ctaLabel} {client.brand.phone}
+    </a>
+  </div>
+</section>
