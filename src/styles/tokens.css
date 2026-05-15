@@ -103,3 +103,58 @@ body { margin: 0; background: var(--bg); color: var(--ink); }
   .ld-logo-wrap { animation: none; opacity: 1; }
   #page-loader.hide { transform: none; opacity: 0; transition: opacity .3s; }
 }
+
+/* ── Progress bar ─────────────────────────────────────────── */
+#progress-bar {
+  position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+  background: var(--blue); z-index: 9999; will-change: width;
+  transition: width .05s linear;
+}
+
+/* ── Sticky mobile call bar ───────────────────────────────── */
+.sticky-mobile {
+  display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 800;
+  background: var(--blue); padding: .875rem 1.5rem;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.15);
+  transform: translateY(100%);
+  transition: transform .35s var(--ease);
+}
+.sticky-mobile.show { transform: translateY(0); }
+.sticky-mobile a {
+  display: flex; align-items: center; justify-content: center; gap: .75rem;
+  color: #fff; text-decoration: none; font-weight: 700; font-size: 1rem;
+}
+.sticky-mobile svg { width: 1.25rem; height: 1.25rem; }
+@media (max-width: 640px) { .sticky-mobile { display: block; } }
+
+/* ── Section helpers ──────────────────────────────────────── */
+.section { padding: 5rem 1.5rem; }
+.section-alt { background: var(--surface); }
+.wrap { max-width: 72rem; margin: 0 auto; }
+.eyebrow {
+  display: inline-block; font-size: .75rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--blue); margin-bottom: .75rem;
+}
+.section-header { text-align: center; max-width: 48rem; margin: 0 auto 3.5rem; }
+.section-header h2 {
+  font-size: clamp(1.875rem,4vw,2.75rem) !important; font-weight: 900 !important;
+  letter-spacing: -.03em !important; color: var(--navy) !important;
+  line-height: 1.1 !important; margin: 0 0 1rem !important;
+}
+.section-header p { font-size: 1.125rem; color: var(--muted); line-height: 1.7; margin: 0; }
+
+/* ── Scroll reveal ────────────────────────────────────────── */
+[data-reveal] {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity .6s var(--ease), transform .6s var(--ease);
+}
+[data-reveal].visible { opacity: 1; transform: none; }
+[data-reveal][data-delay="1"] { transition-delay: .1s; }
+[data-reveal][data-delay="2"] { transition-delay: .2s; }
+[data-reveal][data-delay="3"] { transition-delay: .3s; }
+[data-reveal][data-delay="4"] { transition-delay: .4s; }
+
+/* ── Shared animations ────────────────────────────────────── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+@keyframes ping { 0%,100% { transform: scale(1); opacity: .75; } 50% { transform: scale(2.2); opacity: 0; } }

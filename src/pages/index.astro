@@ -3,14 +3,17 @@ import BaseLayout from '../components/layout/BaseLayout.astro';
 import HeroVideo from '../components/sections/hero/HeroVideo.astro';
 import HeroSplit from '../components/sections/hero/HeroSplit.astro';
 import HeroMinimal from '../components/sections/hero/HeroMinimal.astro';
+import Marquee from '../components/sections/Marquee.astro';
+import TrustStrip from '../components/sections/TrustStrip.astro';
 import ServicesGrid from '../components/sections/services/ServicesGrid.astro';
-import TestimonialsRow from '../components/sections/testimonials/TestimonialsRow.astro';
+import BeforeAfterSlider from '../components/sections/gallery/BeforeAfterSlider.astro';
+import Reviews from '../components/sections/Reviews.astro';
+import WhyUs from '../components/sections/WhyUs.astro';
 import CtaBanner from '../components/sections/cta/CtaBanner.astro';
 import Chatbot from '../components/ui/Chatbot.astro';
 import { client } from '../config/client';
 
 const heroVariant = client.pages.home.hero;
-const sections = client.pages.home.sections;
 ---
 
 <BaseLayout>
@@ -18,12 +21,13 @@ const sections = client.pages.home.sections;
   {heroVariant === 'split'   && <HeroSplit />}
   {heroVariant === 'minimal' && <HeroMinimal />}
 
-  {sections.map(section => {
-    if (section === 'services')     return <ServicesGrid />;
-    if (section === 'testimonials') return <TestimonialsRow />;
-    if (section === 'cta')          return <CtaBanner />;
-    return null;
-  })}
+  <Marquee />
+  <TrustStrip />
+  <ServicesGrid />
+  <BeforeAfterSlider />
+  <Reviews />
+  <WhyUs />
+  <CtaBanner />
 
   <Chatbot />
 </BaseLayout>

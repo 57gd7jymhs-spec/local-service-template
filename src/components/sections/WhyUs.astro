@@ -1,0 +1,77 @@
+---
+import { client } from '../../config/client';
+---
+
+<style>
+.why-section { padding:5rem 1.5rem; background:var(--surface); }
+.why-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:2rem;position:relative; }
+.why-grid::after {
+  content:'';position:absolute;left:50%;top:2rem;width:2px;
+  height:var(--line-h,0px);
+  background:linear-gradient(to bottom,var(--blue),rgba(24,71,237,.15));
+  border-radius:2px;transform:translateX(-50%);pointer-events:none;z-index:0;
+}
+.why-card { background:#fff;border-radius:1.25rem;border:1px solid var(--border);padding:2rem;transition:box-shadow .3s var(--ease); }
+.why-card:hover { box-shadow:0 10px 32px rgba(24,71,237,.09); }
+.why-number { display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;border-radius:50%;background:var(--blue);color:#fff;font-size:.8125rem;font-weight:900;line-height:1;margin-bottom:1.25rem;flex-shrink:0; }
+.why-card h3 { font-size:1.1875rem;font-weight:800;color:var(--navy);margin:0 0 .75rem;letter-spacing:-.02em; }
+.why-card p { font-size:.9375rem;color:var(--muted);line-height:1.65;margin:0 0 1.25rem; }
+.why-badge { display:inline-flex;align-items:center;gap:.5rem;font-size:.75rem;font-weight:600;color:var(--blue);background:#EFF4FF;border-radius:.5rem;padding:.375rem .75rem; }
+.why-badge svg { width:.875rem;height:.875rem; }
+@media(max-width:768px){
+  .why-grid { grid-template-columns:1fr;padding-left:2.75rem; }
+  .why-grid::after { left:.875rem;top:1.5rem;width:2px;transform:none; }
+  .why-card { position:relative; }
+  .why-number { position:absolute;left:-2.75rem;top:1.5rem;width:1.75rem;height:1.75rem;font-size:.75rem;margin-bottom:0;z-index:1; }
+}
+</style>
+
+<section class="why-section" id="waarom">
+  <div class="wrap">
+    <div class="section-header" data-reveal>
+      <span class="eyebrow">Waarom {client.brand.name}</span>
+      <h2>We bouwden de loodgieter die we zelf hadden gewild.</h2>
+      <p>Onbetrouwbare prijzen, trage aankomst en slordig werk — we losten alle drie op.</p>
+    </div>
+    <div class="why-grid" id="whyGrid">
+      <div class="why-card" data-reveal data-delay="1">
+        <div class="why-number">01</div>
+        <h3>45 Minuten Aankomsttijd, Gegarandeerd</h3>
+        <p>We hebben bestelwagens in uw buurt. Als we 45 minuten beloven en te laat komen, krijgt u 10% korting op uw factuur. Geen uitzonderingen, geen excuses.</p>
+        <div class="why-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Getimed &amp; gevolgd</div>
+      </div>
+      <div class="why-card" data-reveal data-delay="2">
+        <div class="why-number">02</div>
+        <h3>Prijs Akkoord Vóór Start van Werken</h3>
+        <p>U krijgt een schriftelijke prijs ter plaatse vóór er iets begint. Dat cijfer verandert niet. Niet nadat de muur open is, niet na iets anders.</p>
+        <div class="why-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Schriftelijk &amp; bindend</div>
+      </div>
+      <div class="why-card" data-reveal data-delay="3">
+        <div class="why-number">03</div>
+        <h3>Opgelost of Gratis — We Menen het</h3>
+        <p>Als we het bij het eerste bezoek niet kunnen oplossen binnen de offerte, bent u ons niets verschuldigd. We komen terug met een plan, zonder extra kosten.</p>
+        <div class="why-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Risicovrije garantie</div>
+      </div>
+      <div class="why-card" data-reveal data-delay="4">
+        <div class="why-number">04</div>
+        <h3>Beschikbaar Elk Uur van Elke Dag</h3>
+        <p>24/7 betekent geen slaperig wachtnummer. Het betekent een echte loodgieter, volledig uitgerust, aan uw deur. Elke nacht, elk weekend, elke feestdag.</p>
+        <div class="why-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Lokaal &amp; altijd bereikbaar</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+const whyGrid = document.getElementById('whyGrid');
+if (whyGrid) {
+  function updateLine() {
+    const rect = whyGrid.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const progress = Math.max(0, Math.min(1, (vh - rect.top) / (rect.height + vh * 0.6)));
+    whyGrid.style.setProperty('--line-h', Math.round(progress * Math.max(0, rect.height - 48)) + 'px');
+  }
+  window.addEventListener('scroll', updateLine, { passive: true });
+  updateLine();
+}
+</script>

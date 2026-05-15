@@ -1,0 +1,67 @@
+---
+import { client } from '../../config/client';
+---
+
+<style>
+.trust-section { padding:4.5rem 1.5rem; background:var(--surface); }
+.trust-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:2rem; }
+.trust-card {
+  text-align:center;padding:2rem 1.5rem;background:#fff;border-radius:1.25rem;
+  border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.04);
+  transition:transform .25s var(--ease),box-shadow .25s var(--ease);
+}
+.trust-card:hover { transform:translateY(-3px);box-shadow:0 8px 28px rgba(24,71,237,.1); }
+.trust-card svg { display:block;margin:0 auto 1rem;color:var(--blue);width:1.75rem;height:1.75rem; }
+.trust-number { font-size:2.5rem;font-weight:900;color:var(--navy);letter-spacing:-.03em;line-height:1;white-space:nowrap; }
+.trust-label { font-size:.875rem;color:var(--muted);margin-top:.375rem; }
+@media(max-width:768px){ .trust-grid{grid-template-columns:repeat(2,1fr)} }
+@media(max-width:480px){ .trust-grid{grid-template-columns:repeat(2,1fr);gap:1rem} .trust-card{padding:1.5rem 1rem} .trust-number{font-size:1.5rem} }
+</style>
+
+<section class="trust-section" id="vertrouwen">
+  <div class="wrap">
+    <div class="trust-grid">
+      <div class="trust-card" data-reveal data-delay="1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div class="trust-number" data-count="45" data-suffix=" min">45 min</div>
+        <div class="trust-label">Gemiddelde aankomsttijd</div>
+      </div>
+      <div class="trust-card" data-reveal data-delay="2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <div class="trust-number" data-count="4800" data-suffix="+">4.800+</div>
+        <div class="trust-label">Tevreden klanten</div>
+      </div>
+      <div class="trust-card" data-reveal data-delay="3">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div class="trust-number" data-count="15" data-suffix=" jr">15 jr</div>
+        <div class="trust-label">Gecertificeerde ervaring</div>
+      </div>
+      <div class="trust-card" data-reveal data-delay="4">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        <div class="trust-number">Gratis</div>
+        <div class="trust-label">Als het niet lukt — onze garantie</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const numEl = el.querySelector('.trust-number');
+    const target = parseInt(el.dataset.count, 10);
+    const suffix = el.dataset.suffix || '';
+    if (!target || !numEl) return;
+    const dur = 1400, start = performance.now();
+    (function tick(now) {
+      const p = Math.min((now - start) / dur, 1), eased = 1 - Math.pow(1 - p, 3);
+      numEl.textContent = Math.round(eased * target).toLocaleString('nl-BE') + suffix;
+      if (p < 1) requestAnimationFrame(tick);
+    })(start);
+    counterObs.unobserve(el);
+  });
+}, { threshold: 0.25 });
+document.querySelectorAll('[data-count]').forEach(el => counterObs.observe(el));
+</script>

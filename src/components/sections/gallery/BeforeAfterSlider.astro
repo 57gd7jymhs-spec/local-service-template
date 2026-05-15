@@ -1,0 +1,141 @@
+---
+import { client } from '../../../config/client';
+
+const slides = client.beforeAfter;
+const captions = slides.map(s => ({
+  title: s.caption,
+  meta: `Opgelost in <span class="caption-time-highlight">${s.time}</span> · ${s.location}`,
+}));
+const tabs = slides.map(s => s.label);
+---
+
+<style>
+.proof-section { padding:5rem 1.5rem;background:var(--surface); }
+.proof-header-row { display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;margin-bottom:2.5rem;flex-wrap:wrap; }
+.proof-header-row .section-header { text-align:left;margin:0; }
+.proof-tabs { display:flex;gap:.5rem;flex-shrink:0; }
+.proof-tab { padding:.5rem 1.25rem;border-radius:.625rem;font-size:.8125rem;font-weight:600;background:transparent;border:1.5px solid var(--border);color:var(--muted);cursor:pointer;transition:all .2s; }
+.proof-tab.active,.proof-tab:hover { background:var(--blue);border-color:var(--blue);color:#fff; }
+.slider-shell { position:relative;border-radius:1.25rem;overflow:hidden;user-select:none;aspect-ratio:16/9;cursor:col-resize;background:#e2e8f0; }
+.slide { position:absolute;inset:0;display:none; }
+.slide.active { display:block; }
+.slide-before,.slide-after { position:absolute;inset:0;background-size:cover;background-position:center; }
+.slide-after { clip-path:inset(0 0 0 50%); }
+.slide-label { position:absolute;bottom:1rem;padding:.375rem .875rem;border-radius:.5rem;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:rgba(0,0,0,.5);color:#fff;backdrop-filter:blur(4px); }
+.slide-label-before { left:1rem; }
+.slide-label-after { right:1rem; }
+.slider-divider { position:absolute;top:0;bottom:0;width:2px;background:#fff;left:50%;transform:translateX(-50%);z-index:10;pointer-events:none;box-shadow:0 0 12px rgba(0,0,0,.3); }
+.slider-handle { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:2.75rem;height:2.75rem;background:var(--blue);border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;gap:2px;cursor:col-resize;pointer-events:all;box-shadow:0 4px 16px rgba(24,71,237,.4); }
+.slider-handle svg { width:1rem;height:1rem;color:#fff;flex-shrink:0; }
+.slider-caption { display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;background:#fff;border:1px solid var(--border);border-top:none;border-radius:0 0 1.25rem 1.25rem;flex-wrap:wrap;gap:1rem; }
+.caption-title { font-size:1.0625rem;font-weight:700;color:var(--navy);margin-bottom:.25rem; }
+.caption-meta { font-size:.8125rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em; }
+.caption-badge-el { display:inline-flex;align-items:center;gap:.5rem;background:#EFF4FF;color:var(--blue);font-size:.75rem;font-weight:700;padding:.375rem .875rem;border-radius:.5rem;flex-shrink:0; }
+.caption-badge-el svg { width:.875rem;height:.875rem; }
+.caption-time-highlight { display:inline-block;background:rgba(24,71,237,.12);color:var(--blue);font-weight:700;padding:1px 7px;border-radius:4px;animation:captionPulse 2.2s ease-in-out infinite; }
+@keyframes captionPulse { 0%,100%{background:rgba(24,71,237,.12);box-shadow:0 0 0 0 rgba(24,71,237,.2)}50%{background:rgba(24,71,237,.19);box-shadow:0 0 0 4px rgba(24,71,237,.07)} }
+</style>
+
+<section class="proof-section" id="resultaten">
+  <div class="wrap">
+    <div class="proof-header-row">
+      <div class="section-header" data-reveal>
+        <span class="eyebrow">Echte resultaten</span>
+        <h2>Het werk spreekt<br>voor zich.</h2>
+        <p>Elke klus achtergelaten netter dan we het aantroffen. Gegarandeerd.</p>
+      </div>
+      <div class="proof-tabs">
+        {tabs.map((tab, i) => (
+          <button class={`proof-tab${i === 0 ? ' active' : ''}`} data-slide={i}>{tab}</button>
+        ))}
+      </div>
+    </div>
+
+    <div class="slider-shell" id="sliderShell">
+      {slides.map((slide, i) => (
+        <div class={`slide${i === 0 ? ' active' : ''}`}>
+          <div class="slide-before" style={`background-image:url('${slide.before}');background-size:cover;background-position:center`}></div>
+          <div class="slide-after"  style={`background-image:url('${slide.after}');background-size:cover;background-position:center`}></div>
+          <span class="slide-label slide-label-before">Voor</span>
+          <span class="slide-label slide-label-after">Na</span>
+        </div>
+      ))}
+      <div class="slider-divider" id="sliderDivider">
+        <div class="slider-handle" id="sliderHandle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="slider-caption">
+      <div>
+        <div class="caption-title" id="captionTitle">{captions[0].title}</div>
+        <div class="caption-meta" id="captionMeta" set:html={captions[0].meta}></div>
+      </div>
+      <div class="caption-badge-el">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Zelfde dag opgelost
+      </div>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ captions }}>
+const shell = document.getElementById('sliderShell');
+const divider = document.getElementById('sliderDivider');
+const handle = document.getElementById('sliderHandle');
+const slides = Array.from(document.querySelectorAll('.slide'));
+const tabEls = Array.from(document.querySelectorAll('.proof-tab'));
+const captionTitle = document.getElementById('captionTitle');
+const captionMeta  = document.getElementById('captionMeta');
+if (!shell || !divider || !handle || !captionTitle || !captionMeta) { }
+else {
+  let cur = 0, pos = 20, dragging = false;
+  let animFrame, animStart, autoPlay = true, resumeTimer;
+  const HALF = 3200;
+
+  slides.forEach(s => { const a = s.querySelector('.slide-after'); if(a) a.style.clipPath = 'inset(0 0 0 20%)'; });
+
+  function clamp(v,lo,hi){ return Math.min(hi,Math.max(lo,v)); }
+  function setPos(p){
+    pos = clamp(p, 2, 98);
+    divider.style.left = pos + '%';
+    const after = slides[cur].querySelector('.slide-after');
+    if (after) after.style.clipPath = `inset(0 0 0 ${pos}%)`;
+  }
+  function smoothstep(t){ return t*t*(3-2*t); }
+  function autoTick(ts){
+    if(!autoPlay) return;
+    if(!animStart) animStart = ts;
+    const phase = (ts-animStart) % (HALF*2);
+    const t = phase < HALF ? phase/HALF : (HALF*2-phase)/HALF;
+    setPos(15 + smoothstep(t)*70);
+    animFrame = requestAnimationFrame(autoTick);
+  }
+  function startAuto(){ autoPlay=true; animStart=null; animFrame=requestAnimationFrame(autoTick); }
+  function stopAuto(){ autoPlay=false; cancelAnimationFrame(animFrame); animStart=null; clearTimeout(resumeTimer); }
+  function scheduleResume(){ clearTimeout(resumeTimer); resumeTimer=setTimeout(startAuto, 2500); }
+
+  function switchSlide(idx){
+    slides[cur].classList.remove('active'); tabEls[cur].classList.remove('active');
+    cur = idx;
+    slides[cur].classList.add('active'); tabEls[cur].classList.add('active');
+    captionTitle.textContent = captions[idx].title;
+    captionMeta.innerHTML = captions[idx].meta;
+    animStart = null;
+  }
+
+  tabEls.forEach((t,i) => t.addEventListener('click', () => switchSlide(i)));
+
+  function getPct(clientX){ const r=shell.getBoundingClientRect(); return (clientX-r.left)/r.width*100; }
+  handle.addEventListener('mousedown', e=>{ dragging=true; stopAuto(); e.preventDefault(); });
+  window.addEventListener('mousemove', e=>{ if(dragging) setPos(getPct(e.clientX)); });
+  window.addEventListener('mouseup', ()=>{ if(!dragging) return; dragging=false; scheduleResume(); });
+  handle.addEventListener('touchstart', e=>{ dragging=true; stopAuto(); e.preventDefault(); }, {passive:false});
+  window.addEventListener('touchmove', e=>{ if(!dragging) return; setPos(getPct(e.touches[0].clientX)); e.preventDefault(); }, {passive:false});
+  window.addEventListener('touchend', ()=>{ if(!dragging) return; dragging=false; scheduleResume(); });
+  shell.addEventListener('click', e=>{ if(e.target===handle||handle.contains(e.target)) return; stopAuto(); setPos(getPct(e.clientX)); scheduleResume(); });
+  startAuto();
+}
+</script>

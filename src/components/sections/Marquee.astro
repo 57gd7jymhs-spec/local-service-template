@@ -1,0 +1,25 @@
+---
+import { client } from '../../config/client';
+
+const items = [
+  'Noodloodgieters', 'Lekdetectie & Reparatie', 'Ketelonderhoud',
+  'Afvoer Ontstopping', 'Centrale Verwarming', 'Pijpvervanging',
+  'Badkamer Installatie', '24/7 Beschikbaar', 'Vaste Prijsofferte',
+];
+---
+
+<style>
+.marquee-section { background:var(--navy);padding:1rem 0;overflow:hidden; }
+.marquee-track { display:flex;gap:0;white-space:nowrap;animation:marquee 28s linear infinite; }
+.marquee-item { display:inline-flex;align-items:center;gap:.75rem;color:rgba(255,255,255,.75);font-size:.875rem;font-weight:500;padding:0 2.5rem; }
+.marquee-dot { width:.375rem;height:.375rem;border-radius:50%;background:var(--blue);flex-shrink:0; }
+@keyframes marquee { from{transform:translateX(0)}to{transform:translateX(-50%)} }
+</style>
+
+<div class="marquee-section" aria-hidden="true">
+  <div class="marquee-track">
+    {[...items, ...items].map(item => (
+      <span class="marquee-item"><span class="marquee-dot"></span>{item}</span>
+    ))}
+  </div>
+</div>

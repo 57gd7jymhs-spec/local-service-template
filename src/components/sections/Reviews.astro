@@ -1,0 +1,105 @@
+---
+import { client } from '../../config/client';
+
+const reviews = [
+  { text: '"Om 23u gebeld wegens een gesprongen pijp. Loodgieter was er na 40 minuten. Kalm, professioneel, opgelost in twee uur. Prijs exact zoals afgesproken. Ik bel nooit iemand anders."', author: 'Lore V.', meta: 'Brugge · Noodoproep' },
+  { text: '"Drie andere bedrijven hadden het lek niet gevonden. Dropwork vond het in 20 minuten met een sensor. Zelfde dag hersteld. Ongelooflijk vakwerk."', author: 'Pieter D.', meta: 'Gent · Lekdetectie' },
+  { text: '"Onze ketel viel uit op Kerstavond. Ze namen meteen op, waren eerlijk dat het mogelijk de volgende ochtend zou zijn, en stonden om 7u aan de deur. Opgelost voor de middag."', author: 'Marie-Claire W.', meta: 'Brugge · Ketelreparatie' },
+  { text: '"Heel netjes en snel gewerkt. Vloerprotectie gelegd voor ze begonnen, alles opgeruimd achteraf. De prijs was exact wat ze telefonisch hadden gezegd."', author: 'Thomas B.', meta: 'Kortrijk · Badkamer' },
+  { text: '"Oprecht verbaasd over hoe professioneel dit verliep. Twee eerdere loodgieters waren te laat, vaag over prijs en lieten een bende achter. Dit was precies het tegenovergestelde."', author: 'Saar M.', meta: 'Brugge · Afvoer' },
+];
+---
+
+<style>
+.reviews-section { padding:4rem 0;background:var(--bg);overflow:hidden; }
+.reviews-section .wrap { padding:0 1.5rem; }
+.aggregate { display:flex;align-items:center;gap:3rem;flex-wrap:wrap;margin-bottom:2.5rem;padding:2rem;background:#fff;border-radius:1.25rem;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.04); }
+.agg-score-big { font-size:4rem;font-weight:900;color:var(--navy);letter-spacing:-.04em;line-height:1; }
+.agg-stars { color:#FBBF24;font-size:1.25rem;letter-spacing:.1em;margin:.25rem 0; }
+.agg-count { font-size:.875rem;color:var(--muted); }
+.platform-rows { flex:1;min-width:200px;display:flex;flex-direction:column;gap:.875rem; }
+.platform-row { display:flex;align-items:center;gap:.875rem; }
+.platform-name { width:5rem;font-size:.8125rem;font-weight:600;color:var(--ink);flex-shrink:0; }
+.platform-bar-bg { flex:1;height:.5rem;background:var(--border);border-radius:9999px;overflow:hidden; }
+.platform-bar { height:100%;background:var(--blue);border-radius:9999px;transition:width 1.2s var(--ease);width:0; }
+.platform-score { width:2rem;text-align:right;font-size:.8125rem;font-weight:700;color:var(--navy); }
+.reviews-marquee { margin-top:2.5rem;overflow:hidden; }
+.reviews-track { display:flex;gap:1.5rem;animation:reviewScroll 40s linear infinite;width:max-content; }
+.review-card { flex-shrink:0;width:20rem;background:#fff;border-radius:1.25rem;border:1px solid var(--border);padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.04); }
+.review-stars { color:#FBBF24;font-size:1rem;letter-spacing:.05em;margin-bottom:.875rem; }
+.review-text { font-size:.9375rem;color:var(--ink);line-height:1.65;margin-bottom:1rem; }
+.review-author { display:flex;flex-direction:column;gap:.125rem; }
+.review-author strong { font-size:.875rem;font-weight:700;color:var(--navy); }
+.review-author span { font-size:.8125rem;color:var(--muted); }
+@keyframes reviewScroll { from{transform:translateX(0)}to{transform:translateX(-50%)} }
+@media(max-width:640px){
+  .reviews-section { padding:2.5rem 0; }
+  .aggregate { padding:1.25rem;gap:1.5rem; }
+  .agg-score-big { font-size:2.75rem; }
+  .reviews-section .section-header { margin-bottom:2rem; }
+}
+</style>
+
+<section class="reviews-section" id="reviews">
+  <div class="wrap">
+    <div class="section-header" data-reveal>
+      <span class="eyebrow">Wat klanten zeggen</span>
+      <h2>320+ tevreden klanten<br>in de regio {client.brand.location}.</h2>
+    </div>
+    <div class="aggregate" data-reveal>
+      <div>
+        <div class="agg-score-big">4.9</div>
+        <div class="agg-stars">★★★★★</div>
+        <div class="agg-count">Uit 320+ geverifieerde beoordelingen</div>
+      </div>
+      <div class="platform-rows">
+        <div class="platform-row">
+          <span class="platform-name">Google</span>
+          <div class="platform-bar-bg"><div class="platform-bar" data-width="96%"></div></div>
+          <span class="platform-score">4.9</span>
+        </div>
+        <div class="platform-row">
+          <span class="platform-name">Facebook</span>
+          <div class="platform-bar-bg"><div class="platform-bar" data-width="92%"></div></div>
+          <span class="platform-score">4.8</span>
+        </div>
+        <div class="platform-row">
+          <span class="platform-name">Trustpilot</span>
+          <div class="platform-bar-bg"><div class="platform-bar" data-width="98%"></div></div>
+          <span class="platform-score">5.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reviews-marquee">
+    <div class="reviews-track" id="reviewsTrack">
+      {[...reviews, ...reviews].map(r => (
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">{r.text}</p>
+          <div class="review-author"><strong>{r.author}</strong><span>{r.meta}</span></div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+const barObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.querySelectorAll('.platform-bar').forEach(b => {
+      (b as HTMLElement).style.width = (b as HTMLElement).dataset.width || '0';
+    });
+    barObs.unobserve(e.target);
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.aggregate').forEach(el => barObs.observe(el));
+
+const track = document.getElementById('reviewsTrack');
+if (track) {
+  track.addEventListener('mouseenter', () => { track.style.animationPlayState = 'paused'; });
+  track.addEventListener('mouseleave', () => { track.style.animationPlayState = 'running'; });
+}
+</script>
