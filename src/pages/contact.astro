@@ -1,0 +1,330 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import { client } from '../config/client';
+
+const pageTitle = `Contact — ${client.brand.name} ${client.brand.tagline}`;
+const pageDesc = `Contacteer ${client.brand.name} in ${client.brand.location}. Bel ${client.brand.phone} of stuur een bericht.`;
+---
+
+<BaseLayout title={pageTitle} description={pageDesc}>
+  <style>
+    .page-hero {
+      background: var(--navy);
+      color: #fff;
+      padding: 8rem 2rem 5rem;
+      text-align: center;
+    }
+    .page-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      letter-spacing: -.04em;
+      margin: 0 0 1rem;
+    }
+    .page-hero p {
+      color: rgba(255,255,255,.7);
+      font-size: 1.1rem;
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    .contact-section {
+      padding: 5rem 2rem;
+      background: var(--bg);
+    }
+    .contact-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    @media (max-width: 720px) {
+      .contact-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+    }
+
+    /* Info column */
+    .contact-info h2 {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -.03em;
+      margin: 0 0 1.5rem;
+    }
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.125rem;
+      margin-bottom: 1.5rem;
+    }
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: .875rem;
+    }
+    .info-icon {
+      width: 36px; height: 36px; flex-shrink: 0;
+      background: rgba(24,71,237,.1);
+      border-radius: .5rem;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--blue);
+    }
+    .info-row div { display: flex; flex-direction: column; }
+    .info-label { font-size: .75rem; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .05em; }
+    .info-value { font-size: .95rem; font-weight: 600; color: var(--navy); margin-top: .1rem; }
+    .info-value a { color: var(--navy); text-decoration: none; }
+    .info-value a:hover { color: var(--blue); }
+
+    .call-btn {
+      display: flex; align-items: center; justify-content: center; gap: .625rem;
+      background: var(--blue); color: #fff;
+      padding: 1rem;
+      border-radius: .75rem;
+      font-weight: 700; font-size: 1rem;
+      text-decoration: none;
+      box-shadow: 0 6px 20px rgba(24,71,237,.35);
+      transition: background .2s, transform .15s;
+    }
+    .call-btn:hover { background: #0f35c4; transform: translateY(-2px); }
+
+    .emergency-note {
+      background: rgba(234,88,12,.08);
+      border: 1px solid rgba(234,88,12,.2);
+      border-radius: .75rem;
+      padding: 1rem 1.25rem;
+      display: flex;
+      gap: .75rem;
+      align-items: flex-start;
+      margin-top: 1.5rem;
+    }
+    .emergency-note svg { flex-shrink: 0; color: #ea580c; }
+    .emergency-note p { font-size: .875rem; color: var(--ink); margin: 0; line-height: 1.5; }
+    .emergency-note strong { color: #ea580c; }
+
+    /* Form column */
+    .contact-form-wrap h2 {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -.03em;
+      margin: 0 0 1.5rem;
+    }
+    .contact-form {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: .375rem;
+    }
+    label {
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    input, textarea, select {
+      border: 1.5px solid var(--border);
+      border-radius: .625rem;
+      padding: .75rem 1rem;
+      font-size: .95rem;
+      color: var(--ink);
+      background: var(--bg);
+      width: 100%;
+      outline: none;
+      transition: border-color .2s;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(24,71,237,.1);
+    }
+    textarea { resize: vertical; min-height: 120px; }
+    .submit-btn {
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: .75rem;
+      padding: .9rem 2rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .2s, transform .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+    }
+    .submit-btn:hover { background: #0f35c4; transform: translateY(-2px); }
+    .form-note {
+      font-size: .8rem;
+      color: var(--ink);
+      opacity: .6;
+      text-align: center;
+    }
+
+    /* Success state */
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+    }
+    .form-success .check {
+      width: 56px; height: 56px;
+      background: rgba(34,197,94,.15);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+      color: #22c55e;
+    }
+    .form-success h3 { color: var(--navy); font-size: 1.25rem; font-weight: 800; margin: 0 0 .5rem; }
+    .form-success p { color: var(--ink); opacity: .7; font-size: .95rem; margin: 0; }
+  </style>
+
+  <div class="page-hero">
+    <h1>Contact</h1>
+    <p>Bel ons direct of stuur een bericht — we antwoorden zo snel mogelijk.</p>
+  </div>
+
+  <section class="contact-section">
+    <div class="contact-inner">
+
+      <div class="contact-info">
+        <h2>Bereikbaarheid</h2>
+        <div class="info-card">
+          <div class="info-row">
+            <div class="info-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            </div>
+            <div>
+              <span class="info-label">Telefoon</span>
+              <span class="info-value"><a href={`tel:${client.brand.phone.replace(/\s/g,'')}`}>{client.brand.phone}</a></span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div>
+              <span class="info-label">E-mail</span>
+              <span class="info-value"><a href={`mailto:${client.brand.email}`}>{client.brand.email}</a></span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <span class="info-label">Openingsuren</span>
+              <span class="info-value">{client.footer.hours}</span>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="info-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div>
+              <span class="info-label">Locatie</span>
+              <span class="info-value">{client.footer.address}</span>
+            </div>
+          </div>
+        </div>
+
+        <a href={`tel:${client.brand.phone.replace(/\s/g,'')}`} class="call-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          Bel direct: {client.brand.phone}
+        </a>
+
+        <div class="emergency-note">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p><strong>Spoedherstelling?</strong> Bel ons direct — we zijn 24/7 bereikbaar en gemiddeld binnen 45 minuten ter plaatse.</p>
+        </div>
+      </div>
+
+      <div class="contact-form-wrap">
+        <h2>Stuur een bericht</h2>
+        <form class="contact-form" id="contactForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Naam</label>
+              <input type="text" id="name" name="name" placeholder="Jan De Smet" required />
+            </div>
+            <div class="form-group">
+              <label for="phone">Telefoon</label>
+              <input type="tel" id="phone" name="phone" placeholder="+32 ..." />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">E-mailadres</label>
+            <input type="email" id="email" name="email" placeholder="jan@voorbeeld.be" required />
+          </div>
+          <div class="form-group">
+            <label for="service">Dienst</label>
+            <select id="service" name="service">
+              <option value="">— Selecteer een dienst —</option>
+              {client.services.map(s => (
+                <option value={s.title}>{s.title}</option>
+              ))}
+              <option value="Andere">Andere</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="message">Bericht</label>
+            <textarea id="message" name="message" placeholder="Beschrijf kort uw probleem of vraag..." required></textarea>
+          </div>
+          <button type="submit" class="submit-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Verstuur bericht
+          </button>
+          <p class="form-note">We antwoorden binnen 2 uur tijdens werkuren.</p>
+        </form>
+
+        <div class="form-success" id="formSuccess">
+          <div class="check">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h3>Bericht ontvangen!</h3>
+          <p>We nemen zo snel mogelijk contact met u op. U kunt ons ook bereiken op {client.brand.phone}.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <script>
+    const form = document.getElementById('contactForm') as HTMLFormElement | null;
+    const success = document.getElementById('formSuccess');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      btn.disabled = true;
+      btn.textContent = 'Verzenden...';
+
+      await new Promise(r => setTimeout(r, 800));
+
+      form.style.display = 'none';
+      if (success) success.style.display = 'block';
+    });
+  </script>
+</BaseLayout>
