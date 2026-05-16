@@ -1,20 +1,24 @@
 import type { APIRoute } from 'astro';
 import { client } from '../../config/client';
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async (context) => {
+  const { request, locals } = context;
   const { messages } = await request.json();
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return new Response(JSON.stringify({ error: 'messages required' }), { status: 400 });
   }
 
-  const apiKey = import.meta.env.GROQ_API_KEY;
+  // Cloudflare Pages runtime secrets live in locals.runtime.env, not import.meta.env
+  const runtimeEnv = (locals as any)?.runtime?.env ?? {};
+  const apiKey = runtimeEnv.GROQ_API_KEY ?? import.meta.env.GROQ_API_KEY;
+
   if (!apiKey) {
     return new Response(JSON.stringify({ error: 'not_configured' }), { status: 500 });
   }
 
   try {
-    const gatewayUrl = import.meta.env.CF_AI_GATEWAY_URL;
+    const gatewayUrl = runtimeEnv.CF_AI_GATEWAY_URL ?? import.meta.env.CF_AI_GATEWAY_URL;
     const groqUrl = gatewayUrl || 'https://api.groq.com/openai/v1/chat/completions';
     const response = await fetch(groqUrl, {
       method: 'POST',
