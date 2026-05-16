@@ -110,12 +110,20 @@ export const client = {
 
   beforeAfter: [
     {
+      label: "Badkamer",
+      before: "/images/before-bathroom.png",
+      after: "/images/after-bathroom.png",
+      caption: "Badkamer renovatie",
+      time: "1 dag",
+      location: "Brugge",
+    },
+    {
       label: "Afvoer",
-      before: "/images/before-drain.jpg",
-      after: "/images/after-drain.jpg",
+      before: "/images/before-drain.png",
+      after: "/images/after-drain.png",
       caption: "Afvoer ontstopt",
       time: "45 min",
-      location: "Brugge",
+      location: "Gent",
     },
     {
       label: "Kraan",
@@ -123,14 +131,6 @@ export const client = {
       after: "/images/after-faucet.png",
       caption: "Kraan vervangen",
       time: "30 min",
-      location: "Gent",
-    },
-    {
-      label: "Toilet",
-      before: "/images/before-toilet.jpg",
-      after: "/images/after-toilet.jpg",
-      caption: "Toilet geïnstalleerd",
-      time: "2 uur",
       location: "Brugge",
     },
   ],

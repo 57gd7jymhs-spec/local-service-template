@@ -1,175 +1,529 @@
 ---
 import { client } from '../../config/client';
 if (!client.ai.enabled) return;
+
+const phone = client.brand.phone.replace(/\s/g, '');
+const phoneDisplay = client.brand.phone;
+const brandName = client.brand.name;
+const logoNegative = client.brand.logoNegative;
 ---
 
 <style>
-  #faq-btn {
-    position: fixed; bottom: 24px; right: 24px; z-index: 9000;
-    width: 52px; height: 52px; border-radius: 50%;
-    background: var(--blue); color: #fff; border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 8px 24px rgba(24,71,237,.45);
-    transition: transform .2s, box-shadow .2s;
+#faq-btn {
+  position:fixed;bottom:24px;right:24px;z-index:9998;
+  width:56px;height:56px;border-radius:50%;
+  background:var(--navy);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(13,30,92,.35);
+  transition:transform .2s var(--ease),box-shadow .2s var(--ease);
+}
+#faq-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(13,30,92,.45);}
+#faq-btn:focus-visible{outline:3px solid var(--blue);outline-offset:3px;}
+#faq-btn svg{width:24px;height:24px;}
+.faq-dot{
+  position:absolute;top:10px;right:10px;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--blue);border:2px solid #fff;
+  animation:faqPulse 2s ease-in-out infinite;
+}
+@keyframes faqPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.25);opacity:.7;}}
+#faq-panel{
+  position:fixed;bottom:92px;right:24px;z-index:9997;
+  width:360px;max-height:520px;
+  background:#fff;border-radius:1.25rem;
+  box-shadow:0 8px 48px rgba(13,30,92,.18),0 2px 8px rgba(0,0,0,.08);
+  display:flex;flex-direction:column;overflow:hidden;
+  opacity:0;transform:translateY(16px) scale(.97);
+  pointer-events:none;
+  transition:opacity .25s var(--ease),transform .25s var(--ease);
+}
+#faq-panel.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto;}
+.faq-header{
+  background:var(--navy);color:#fff;
+  padding:1rem 1.125rem;display:flex;align-items:center;gap:.75rem;flex-shrink:0;
+}
+.faq-header-logo{
+  width:36px;height:36px;border-radius:.5rem;
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  padding:4px;flex-shrink:0;
+}
+.faq-header-logo img{width:100%;height:100%;object-fit:contain;display:block;}
+.faq-header-title{flex:1;}
+.faq-header-title strong{display:block;font-size:.9375rem;font-weight:700;}
+.faq-header-title span{font-size:.75rem;opacity:.85;display:flex;align-items:center;gap:.375rem;}
+.faq-online-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;box-shadow:0 0 0 2px rgba(34,197,94,.25);}
+.faq-close{
+  background:none;border:none;cursor:pointer;color:#fff;opacity:.7;
+  padding:4px;border-radius:.375rem;display:flex;align-items:center;
+  transition:opacity .15s;
+}
+.faq-close:hover{opacity:1;}
+.faq-close:focus-visible{outline:2px solid #fff;}
+.faq-messages{
+  flex:1;overflow-y:auto;padding:1rem;
+  display:flex;flex-direction:column;gap:.625rem;
+  scroll-behavior:smooth;
+}
+.faq-messages::-webkit-scrollbar{width:4px;}
+.faq-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.faq-bubble-row{display:flex;gap:.5rem;align-items:flex-end;}
+.faq-bubble-row.user{flex-direction:row-reverse;}
+.faq-avatar{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--blue);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;overflow:hidden;
+}
+.faq-avatar svg{width:20px;height:20px;display:block;}
+.faq-bubble{
+  max-width:80%;padding:.625rem .875rem;
+  border-radius:1rem;font-size:.875rem;line-height:1.5;
+}
+.faq-bubble-row.bot .faq-bubble{
+  background:#F3F4F8;color:var(--ink);border-bottom-left-radius:.25rem;
+}
+.faq-bubble-row.user .faq-bubble{
+  background:var(--blue);color:#fff;border-bottom-right-radius:.25rem;
+}
+.faq-typing{
+  display:flex;align-items:center;gap:4px;
+  padding:.5rem .875rem;background:#F3F4F8;
+  border-radius:1rem;border-bottom-left-radius:.25rem;width:fit-content;
+}
+.faq-typing span{
+  width:6px;height:6px;border-radius:50%;background:var(--muted);
+  animation:faqDot .9s ease-in-out infinite;
+}
+.faq-typing span:nth-child(2){animation-delay:.15s;}
+.faq-typing span:nth-child(3){animation-delay:.3s;}
+@keyframes faqDot{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-4px);opacity:1;}}
+.faq-cta-btn{
+  display:block;margin-top:.625rem;
+  background:var(--blue);color:#fff;
+  border-radius:.5rem;padding:.5rem 1rem;
+  font-weight:700;font-size:.8125rem;
+  text-align:center;text-decoration:none;cursor:pointer;
+  transition:background .15s,transform .15s;
+}
+.faq-cta-btn:hover{background:var(--navy);transform:translateY(-1px);}
+.faq-chips{display:flex;flex-direction:column;gap:.375rem;margin-top:.375rem;}
+.faq-chip{
+  background:transparent;border:1.5px solid var(--border);
+  border-radius:.625rem;padding:.4rem .75rem;
+  font-size:.8125rem;cursor:pointer;text-align:left;
+  color:var(--ink);transition:background .15s,border-color .15s,color .15s;
+}
+.faq-chip:hover{background:var(--bg);border-color:var(--blue);color:var(--blue);}
+.faq-chip:focus-visible{outline:2px solid var(--blue);outline-offset:2px;}
+#faq-shortcuts{display:flex;flex-wrap:wrap;gap:.375rem;padding:.5rem 1rem;border-top:1px solid var(--border);flex-shrink:0;}
+#faq-shortcuts .faq-chip{white-space:nowrap;padding:.3rem .65rem;font-size:.75rem;}
+.faq-inline-chips{display:flex;flex-wrap:wrap;gap:.375rem;margin-top:.5rem;}
+.faq-inline-chip{background:transparent;border:1.5px solid var(--border);border-radius:.5rem;padding:.3rem .6rem;font-size:.75rem;cursor:pointer;color:var(--ink);transition:background .15s,border-color .15s,color .15s;white-space:nowrap;}
+.faq-inline-chip:hover{background:var(--bg);border-color:var(--blue);color:var(--blue);}
+.faq-input-row{
+  display:flex;gap:.5rem;padding:.75rem 1rem;
+  border-top:1px solid var(--border);flex-shrink:0;
+}
+#faq-input{
+  flex:1;border:1.5px solid var(--border);border-radius:.625rem;
+  padding:.5rem .75rem;font-size:.875rem;color:var(--ink);
+  outline:none;transition:border-color .15s;background:#fff;
+}
+#faq-input:focus{border-color:var(--blue);}
+#faq-send{
+  width:36px;height:36px;border-radius:.625rem;
+  background:var(--blue);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s,transform .15s;flex-shrink:0;
+}
+#faq-send:hover{background:var(--navy);transform:scale(1.05);}
+#faq-send:focus-visible{outline:2px solid var(--blue);outline-offset:2px;}
+#faq-send svg{width:16px;height:16px;}
+@media(max-width:640px){
+  #faq-panel{
+    position:fixed;inset:0;width:100%;
+    height:100vh;height:100dvh;
+    max-height:none;border-radius:0;
+    opacity:1;transform:translateY(100%);
+    transition:transform .35s var(--ease);
   }
-  #faq-btn:hover { transform: scale(1.08); box-shadow: 0 12px 32px rgba(24,71,237,.6); }
-  #faq-panel {
-    position: fixed; bottom: 88px; right: 24px; z-index: 9000;
-    width: 360px; max-height: 520px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 1.25rem; box-shadow: 0 24px 64px rgba(0,0,0,.18);
-    display: flex; flex-direction: column; overflow: hidden;
-    opacity: 0; transform: scale(.95) translateY(8px);
-    pointer-events: none;
-    transition: opacity .25s var(--ease), transform .25s var(--ease);
-  }
-  #faq-panel.open { opacity: 1; transform: none; pointer-events: all; }
-  .panel-header {
-    background: var(--navy); color: #fff;
-    padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between;
-    flex-shrink: 0;
-  }
-  .panel-header-info { display: flex; align-items: center; gap: .625rem; }
-  .panel-avatar {
-    width: 32px; height: 32px; border-radius: 50%; background: var(--blue);
-    display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 800;
-  }
-  .panel-name { font-size: .875rem; font-weight: 700; }
-  .panel-status { font-size: .7rem; color: rgba(255,255,255,.55); }
-  #faq-close { background: none; border: none; color: rgba(255,255,255,.6); cursor: pointer; padding: .25rem; border-radius: .375rem; }
-  #faq-close:hover { color: #fff; }
-  #faq-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: .75rem; }
-  .msg { max-width: 85%; padding: .625rem .875rem; border-radius: 1rem; font-size: .875rem; line-height: 1.5; }
-  .msg-bot { background: var(--bg); color: var(--ink); border-radius: 1rem 1rem 1rem .25rem; align-self: flex-start; }
-  .msg-user { background: var(--blue); color: #fff; border-radius: 1rem 1rem .25rem 1rem; align-self: flex-end; }
-  .typing { display: flex; gap: .3rem; align-items: center; padding: .625rem .875rem; }
-  .typing span { width: 6px; height: 6px; background: var(--muted); border-radius: 50%; animation: blink 1.2s infinite; }
-  .typing span:nth-child(2) { animation-delay: .2s; }
-  .typing span:nth-child(3) { animation-delay: .4s; }
-  @keyframes blink { 0%,80%,100%{opacity:.2}40%{opacity:1} }
-  .msg-cta {
-    display: inline-flex; align-items: center; gap: .4rem; margin-top: .5rem;
-    background: var(--blue); color: #fff; text-decoration: none;
-    padding: .45rem .875rem; border-radius: .5rem; font-size: .8rem; font-weight: 700;
-  }
-  #faq-form { display: flex; gap: .5rem; padding: .75rem; border-top: 1px solid var(--border); flex-shrink: 0; }
-  #faq-input {
-    flex: 1; border: 1px solid var(--border); border-radius: .625rem;
-    padding: .55rem .875rem; font-size: 16px; outline: none;
-    transition: border-color .2s;
-  }
-  #faq-input:focus { border-color: var(--blue); }
-  #faq-send {
-    background: var(--blue); color: #fff; border: none; cursor: pointer;
-    width: 38px; height: 38px; border-radius: .625rem;
-    display: flex; align-items: center; justify-content: center;
-    transition: background .2s;
-  }
-  #faq-send:hover { background: #0f35c4; }
-
-  @media (max-width: 640px) {
-    #faq-panel {
-      position: fixed; inset: 0; width: 100%; height: 100dvh;
-      max-height: none; border-radius: 0; bottom: unset; right: unset;
-      opacity: 1; transform: translateY(100%);
-      transition: transform .35s var(--ease);
-    }
-    #faq-panel.open { transform: translateY(0); }
-    #faq-btn { bottom: 16px; right: 16px; }
-  }
+  #faq-panel.open{transform:translateY(0);opacity:1;}
+  #faq-btn{bottom:16px;right:16px;}
+  #faq-input{font-size:16px;}
+}
 </style>
 
-<button id="faq-btn" aria-label="Chat openen" aria-expanded="false">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<button id="faq-btn" aria-label="Stel een vraag" aria-expanded="false" aria-controls="faq-panel">
+  <svg fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
   </svg>
+  <span class="faq-dot" aria-hidden="true"></span>
 </button>
 
-<div id="faq-panel" role="dialog" aria-label="Chat" aria-modal="true">
-  <div class="panel-header">
-    <div class="panel-header-info">
-      <div class="panel-avatar">AI</div>
-      <div>
-        <div class="panel-name">{client.brand.name}</div>
-        <div class="panel-status">Online — antwoordt direct</div>
-      </div>
+<div id="faq-panel" role="dialog" aria-label="FAQ chatbot" aria-modal="true">
+  <div class="faq-header">
+    <div class="faq-header-logo">
+      <img src={logoNegative} alt={brandName}>
     </div>
-    <button id="faq-close" aria-label="Sluiten">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    <div class="faq-header-title">
+      <strong>{brandName} Assistent</strong>
+      <span><span class="faq-online-dot" aria-hidden="true"></span>Online — Stel ons een vraag</span>
+    </div>
+    <button class="faq-close" aria-label="Sluiten">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
     </button>
   </div>
-  <div id="faq-messages">
-    <div class="msg msg-bot">Hallo! Ik ben de digitale assistent van {client.brand.name}. Hoe kan ik u helpen? 👋</div>
-  </div>
-  <form id="faq-form">
-    <input id="faq-input" type="text" placeholder="Stel uw vraag..." autocomplete="off" />
-    <button id="faq-send" type="submit" aria-label="Versturen">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+  <div class="faq-messages" id="faq-messages" role="log" aria-live="polite" aria-atomic="false"></div>
+  <div id="faq-shortcuts" role="toolbar" aria-label="Snelkoppelingen"></div>
+  <div class="faq-input-row">
+    <input id="faq-input" type="text" placeholder="Typ uw vraag..." autocomplete="off" aria-label="Typ uw vraag">
+    <button id="faq-send" aria-label="Verstuur">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
     </button>
-  </form>
+  </div>
 </div>
 
-<script define:vars={{ phone: client.brand.phone }}>
-  const btn = document.getElementById('faq-btn');
-  const panel = document.getElementById('faq-panel');
-  const closeBtn = document.getElementById('faq-close');
-  const form = document.getElementById('faq-form');
-  const input = document.getElementById('faq-input');
-  const messages = document.getElementById('faq-messages');
-  const history = [];
+<script define:vars={{ phone, phoneDisplay, brandName }}>
+(function(){
+  var FAQ_DATA=[
+    {id:'emergency',chip:'🚨 Noodgeval',
+     keywords:['nood','spoed','dringend','lek','lekkage','lekt','burst','vloed','overstroming',
+               'gesprongen','spuit','waterlek','pijp','druk','urgent','crisis','schade',
+               'ondergelopen','overloopt','kapot','water op','wateroverlast',
+               'emergency','flood','pipe','broken','leaking','leak','help'],
+     answer:'Bij een noodgeval: sluit eerst de <strong>hoofdkraan</strong> af (meestal bij de meterkast). Bel ons daarna direct — wij zijn 24/7 bereikbaar en gemiddeld binnen <strong>45 minuten</strong> ter plaatse.'},
+    {id:'services',chip:'🔧 Diensten & prijzen',
+     keywords:['dienst','service','prijs','kost','tarief','ketel','afvoer','lekdetectie','verstopt',
+               'onderhoud','reparatie','installatie','offerte','kosten','hoeveel','euro','betalen',
+               'aanbod','welke','bieden','repareer','maken','verhelpen','probleem','fix',
+               'price','cost','how much','services','what do you','can you fix'],
+     answer:'Wij bieden:<br>• Noodloodgieters (24/7)<br>• Lekdetectie &amp; reparatie<br>• Afvoer ontstopping<br>• Ketel reparatie &amp; onderhoud<br><br>Prijzen variëren per klus. Bel ons voor een <strong>gratis offerte</strong> zonder verplichtingen.'},
+    {id:'availability',chip:'📍 Bereikbaarheid & regio',
+     keywords:['wanneer','bereikbaar','regio','gebied','stad','beschikbaar','open','uur','tijdstip',
+               'brugge','omgeving','openingsuur','openingsuren','openingstijden','uren','tijden',
+               'vandaag','morgen','weekend','zondag','zaterdag','nacht','avond','middag',
+               'hoe laat','werktijden','feestdag','vakantie',
+               'today','tomorrow','hours','when','time','schedule','available','open tomorrow'],
+     answer:'Wij zijn <strong>7 dagen per week, 24 uur per dag</strong> bereikbaar — ook in het weekend en op feestdagen. Aankomsttijd: gemiddeld <strong>45 minuten</strong>.'},
+    {id:'booking',chip:'📅 Afspraak maken',
+     keywords:['afspraak','boek','reserveer','plan','komen','langskomen','inplannen','datum','bezoek',
+               'afspreken','langs','iemand sturen','loodgieter sturen','kom langs','contact',
+               'appointment','book','visit','schedule','send someone'],
+     answer:'Een afspraak maken gaat het snelst telefonisch. Bel ons zodat we direct beschikbaarheid en locatie kunnen afstemmen — doorgaans kunnen we <strong>dezelfde dag</strong> nog langskomen.'},
+    {id:'about',chip:'🏢 Over '+brandName,
+     keywords:['wie','dropwork','ervaring','jaar','team','betrouwbaar','gecertificeerd','over',
+               'garantie','klanten','info','vertrouw','verzekerd','reviews','beoordelingen',
+               'rating','erkend','gediplomeerd','about','who are you','history','credentials'],
+     answer:brandName+' staat voor snelle, eerlijke en vakkundige service. Met meer dan <strong>15 jaar ervaring</strong> en <strong>4.800+ tevreden klanten</strong> bent u in goede handen. Al onze loodgieters zijn gecertificeerd en werken met garantie.'}
+  ];
 
-  function open() { panel.classList.add('open'); btn.setAttribute('aria-expanded','true'); input.focus(); }
-  function close() { panel.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
-  btn.addEventListener('click', () => panel.classList.contains('open') ? close() : open());
-  closeBtn.addEventListener('click', close);
+  var INTENT_PATTERNS=[
+    {re:/openings ?uur|openings ?uren|openingstijd|werktijden|hoe laat.*(open|beschikbaar|kom|langs)|wanneer.*(open|beschikbaar|bereikbaar|jullie)|are you open|what.*hour|when.*open|jullie.*open|open.*vandaag|vandaag.*open|morgen.*open|open.*morgen|open.*weekend|zijn jullie.*open/i, id:'availability'},
+    {re:/nood|spoed|dringend|water op de vloer|ondergelopen|overstroming|vloed|gesprongen pijp|pijp gesprongen|toilet overloopt|kraan.*kapot|emergency|urgent|snel.*help|help.*snel/i, id:'emergency'},
+    {re:/hoeveel kost|wat kost|wat is de prijs|prijs.*van|tarief.*voor|offerte.*aanvragen|how much.*cost|price.*for|cost.*of|wat.*prijs|kost.*het/i, id:'services'},
+    {re:/afspraak.*maken|een afspraak|afspreken|wanneer.*langskomen|iemand.*sturen|loodgieter.*sturen|kan.*langskomen|kom.*langs|appointment|book.*visit|schedule.*visit|langs.*komen/i, id:'booking'},
+    {re:/wie zijn jullie|over dropwork|wat is dropwork|jullie.*ervaring|hoeveel jaar|gecertificeerd.*zijn|about you|who are you|betrouwbaar.*zijn/i, id:'about'}
+  ];
 
-  function addMsg(text, role, showCta = false) {
-    const el = document.createElement('div');
-    el.className = `msg msg-${role === 'user' ? 'user' : 'bot'}`;
-    el.textContent = text;
-    if (showCta) {
-      const cta = document.createElement('div');
-      cta.style.marginTop = '.5rem';
-      const a = document.createElement('a');
-      a.href = `tel:${phone.replace(/\s/g,'')}`;
-      a.className = 'msg-cta';
-      a.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg> Bel direct`;
-      cta.appendChild(a); el.appendChild(cta);
+  var PRICE_DATA={
+    lekdetectie:{label:'Lekdetectie',range:'€ 95 – € 175',note:'afhankelijk van omvang en toegankelijkheid'},
+    afvoer:{label:'Afvoer ontstopping',range:'€ 75 – € 150',note:'standaard tot complexe verstopping'},
+    ketel:{label:'Ketelonderhoud/-rep.',range:'€ 90 – € 220',note:'onderhoud of reparatie, excl. onderdelen'},
+    installatie:{label:'Installatie',range:'€ 120 – € 300',note:'afhankelijk van type en complexiteit'}
+  };
+  var PRICE_SYNONYMS={
+    lekdetectie:['lek','lekkage','detectie','lekt','waterlek'],
+    afvoer:['afvoer','verstopt','riool','gootsteen','afvoerpijp','prop'],
+    ketel:['ketel','boiler','cv','verwarming','warmwater','geiser'],
+    installatie:['kraan','toilet','wastafel','douche','bad','sink','lavabo','wasbak','installeer']
+  };
+  var PRICE_CHIPS=[
+    {id:'lekdetectie',label:'🔧 Lekdetectie'},
+    {id:'afvoer',label:'🚿 Afvoer'},
+    {id:'ketel',label:'🔥 Ketel'},
+    {id:'installatie',label:'🚰 Installatie'},
+    {id:'other',label:'❓ Anders'}
+  ];
+
+  var RE_GREET=/^(hallo|dag|goedemorgen|goedemiddag|goedenavond|goede avond|goede morgen|goede middag|hi|hello|hey|hoi|salut|goeie|bonjour)\b[\s!.?]*$/i;
+  var RE_THANKS=/(dankje|dank je wel|dank je|bedankt|dank u wel|dank u|merci|thanks|thank you|super bedankt|heel erg bedankt|fijn zo|top bedankt)/i;
+  var RE_YES=/^(ja|yes|ok|okay|graag|zeker|alstublieft|klopt|juist|correct|akkoord|goed|prima|doen|yep)\b[\s!.?]*$/i;
+  var RE_NO=/^(nee|neen|no|niet|negatief|liever niet|hoeft niet|nopes)\b[\s!.?]*$/i;
+
+  var btn=document.getElementById('faq-btn');
+  var panel=document.getElementById('faq-panel');
+  var msgs=document.getElementById('faq-messages');
+  var inp=document.getElementById('faq-input');
+  var sendBtn=document.getElementById('faq-send');
+  var closeBtn=panel.querySelector('.faq-close');
+  var dot=btn.querySelector('.faq-dot');
+  var opened=false;
+  var shortcutsBuilt=false;
+  var lastContext=null;
+  var conversationHistory=[];
+  var aiPending=false;
+
+  function togglePanel(){
+    opened=!opened;
+    panel.classList.toggle('open',opened);
+    btn.setAttribute('aria-expanded',String(opened));
+    if(opened){
+      if(dot) dot.style.display='none';
+      if(window.innerWidth<=640){
+        document.body.style.overflow='hidden';
+        btn.style.display='none';
+      }
+      if(!msgs.hasChildNodes()) showWelcome();
+      setTimeout(function(){inp.focus();},260);
+    } else {
+      document.body.style.overflow='';
+      btn.style.display='';
     }
-    messages.appendChild(el);
-    messages.scrollTop = messages.scrollHeight;
   }
 
-  function showTyping() {
-    const el = document.createElement('div');
-    el.className = 'msg msg-bot typing'; el.id = 'typing';
-    el.innerHTML = '<span></span><span></span><span></span>';
-    messages.appendChild(el); messages.scrollTop = messages.scrollHeight;
-    return el;
+  function buildShortcuts(){
+    if(shortcutsBuilt) return;
+    shortcutsBuilt=true;
+    var bar=document.getElementById('faq-shortcuts');
+    FAQ_DATA.forEach(function(faq){
+      var chip=document.createElement('button');
+      chip.type='button';chip.className='faq-chip';chip.textContent=faq.chip;
+      chip.addEventListener('click',function(){ sendMsg(faq.chip,faq); });
+      bar.appendChild(chip);
+    });
   }
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const text = input.value.trim();
-    if (!text) return;
-    input.value = '';
-    addMsg(text, 'user');
-    history.push({ role: 'user', content: text });
-    const typing = showTyping();
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history }),
+  function showWelcome(){
+    addBotMsg('Hallo! Ik ben de '+brandName+' assistent. Waarmee kan ik u helpen?',false);
+    buildShortcuts();
+  }
+
+  function levenshtein(a,b){
+    var m=a.length,n=b.length,dp=[];
+    for(var i=0;i<=m;i++){
+      dp[i]=[i];
+      for(var j=1;j<=n;j++)
+        dp[i][j]=i===0?j:j===0?i:a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+    }
+    return dp[m][n];
+  }
+
+  function matchFAQ(text){
+    var norm=text.toLowerCase().replace(/[^a-z0-9àáâãäåæçèéêëìíîïðñòóôõöùúûüýþÿ\s]/g,'').replace(/\s+/g,' ').trim();
+
+    for(var p=0;p<INTENT_PATTERNS.length;p++){
+      if(INTENT_PATTERNS[p].re.test(norm)){
+        var intentMatch=FAQ_DATA.filter(function(f){ return f.id===INTENT_PATTERNS[p].id; })[0];
+        if(intentMatch) return intentMatch;
+      }
+    }
+
+    var noSpace=norm.replace(/\s/g,'');
+    var best=null,bestScore=0;
+    FAQ_DATA.forEach(function(faq){
+      var score=0;
+      faq.keywords.forEach(function(kw){
+        if(norm.indexOf(kw)!==-1||noSpace.indexOf(kw)!==-1) score+=2;
       });
-      const data = await res.json();
-      typing.remove();
-      const reply = data.reply || 'Er ging iets mis. Bel ons gerust direct.';
-      history.push({ role: 'assistant', content: reply });
-      addMsg(reply, 'bot', true);
-    } catch {
-      typing.remove();
-      addMsg('Er ging iets mis. Bel ons gerust direct.', 'bot', true);
+      if(score>bestScore){bestScore=score;best=faq;}
+    });
+    if(bestScore>=2) return best;
+
+    var words=norm.split(' ').filter(function(w){ return w.length>=3; });
+    if(!words.length) return null;
+    best=null;bestScore=0;
+    FAQ_DATA.forEach(function(faq){
+      var score=0;
+      faq.keywords.forEach(function(kw){
+        words.forEach(function(word){
+          var maxDist=word.length>=7?2:word.length>=4?1:0;
+          if(maxDist>0&&levenshtein(word,kw)<=maxDist) score++;
+        });
+      });
+      if(score>bestScore){bestScore=score;best=faq;}
+    });
+    return bestScore>=1?best:null;
+  }
+
+  function buildCTA(){
+    var a=document.createElement('a');
+    a.href='tel:'+phone;a.className='faq-cta-btn';
+    a.textContent='📞 Bel direct: '+phoneDisplay;
+    return a;
+  }
+
+  function avatarEl(){
+    var av=document.createElement('div');av.className='faq-avatar';
+    av.innerHTML='<svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
+    return av;
+  }
+
+  function buildPriceChips(){
+    var wrap=document.createElement('div');wrap.className='faq-inline-chips';
+    PRICE_CHIPS.forEach(function(pc){
+      var b=document.createElement('button');
+      b.type='button';b.className='faq-inline-chip';b.textContent=pc.label;
+      b.addEventListener('click',function(){ handlePriceChip(pc.id,pc.label); });
+      wrap.appendChild(b);
+    });
+    return wrap;
+  }
+
+  function buildClarifyChips(){
+    var wrap=document.createElement('div');wrap.className='faq-inline-chips';
+    FAQ_DATA.forEach(function(faq){
+      var b=document.createElement('button');
+      b.type='button';b.className='faq-inline-chip';b.textContent=faq.chip;
+      b.addEventListener('click',function(){ sendMsg(faq.chip,faq); });
+      wrap.appendChild(b);
+    });
+    return wrap;
+  }
+
+  function handlePriceChip(id,label){
+    addUserMsg(label);
+    if(id==='other'){
+      lastContext='prices';
+      addBotMsg('Geen probleem! Beschrijf kort uw klus en ik geef u een ruwe indicatie, of bel ons voor een <strong>gratis offerte</strong>.',true);
+      return;
     }
-  });
+    var d=PRICE_DATA[id];
+    if(d){
+      lastContext='prices';
+      addBotMsg('<strong>'+d.label+'</strong>: indicatief <strong>'+d.range+'</strong> incl. BTW<br><small style="color:var(--muted);">('+d.note+')</small><br><br>Voor een exacte prijs op maat, bel ons voor een gratis offerte.',true);
+    }
+  }
+
+  function addUserMsg(text){
+    var row=document.createElement('div');row.className='faq-bubble-row user';
+    var b=document.createElement('div');b.className='faq-bubble';b.textContent=text;
+    row.appendChild(b);msgs.appendChild(row);msgs.scrollTop=msgs.scrollHeight;
+  }
+
+  function addBotMsg(html,withCTA,extraNode){
+    if(withCTA===undefined) withCTA=true;
+    var typingRow=document.createElement('div');typingRow.className='faq-bubble-row bot';
+    var typing=document.createElement('div');typing.className='faq-typing';
+    typing.innerHTML='<span></span><span></span><span></span>';
+    typingRow.appendChild(avatarEl());typingRow.appendChild(typing);
+    msgs.appendChild(typingRow);msgs.scrollTop=msgs.scrollHeight;
+    setTimeout(function(){
+      typingRow.remove();
+      var row=document.createElement('div');row.className='faq-bubble-row bot';
+      var b=document.createElement('div');b.className='faq-bubble';
+      b.innerHTML=html;
+      if(extraNode) b.appendChild(extraNode);
+      if(withCTA) b.appendChild(buildCTA());
+      row.appendChild(avatarEl());row.appendChild(b);
+      msgs.appendChild(row);msgs.scrollTop=msgs.scrollHeight;
+    },650);
+  }
+
+  function matchPriceData(text){
+    var norm=text.toLowerCase();
+    var found=null;
+    Object.keys(PRICE_SYNONYMS).forEach(function(key){
+      PRICE_SYNONYMS[key].forEach(function(syn){ if(norm.indexOf(syn)!==-1) found=key; });
+    });
+    if(!found) Object.keys(PRICE_DATA).forEach(function(key){ if(norm.indexOf(key)!==-1) found=key; });
+    return found?PRICE_DATA[found]:null;
+  }
+
+  function showTyping(){
+    var row=document.createElement('div');row.className='faq-bubble-row bot';row.id='faq-ai-typing';
+    var t=document.createElement('div');t.className='faq-typing';t.innerHTML='<span></span><span></span><span></span>';
+    row.appendChild(avatarEl());row.appendChild(t);
+    msgs.appendChild(row);msgs.scrollTop=msgs.scrollHeight;
+  }
+
+  function hideTypingAndShow(html,withCTA){
+    var old=document.getElementById('faq-ai-typing');if(old) old.remove();
+    var row=document.createElement('div');row.className='faq-bubble-row bot';
+    var b=document.createElement('div');b.className='faq-bubble';b.innerHTML=html;
+    if(withCTA) b.appendChild(buildCTA());
+    row.appendChild(avatarEl());row.appendChild(b);
+    msgs.appendChild(row);msgs.scrollTop=msgs.scrollHeight;
+  }
+
+  async function callAI(userText){
+    if(aiPending) return;
+    aiPending=true;
+    inp.disabled=true;sendBtn.disabled=true;
+    conversationHistory.push({role:'user',content:userText});
+    showTyping();
+    try{
+      var res=await fetch('/api/chat',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({messages:conversationHistory.slice(-8)})
+      });
+      var data=await res.json();
+      if(data.reply){
+        conversationHistory.push({role:'assistant',content:data.reply});
+        hideTypingAndShow(data.reply,true);
+      } else {
+        throw new Error('no reply');
+      }
+    } catch(e){
+      var faq=matchFAQ(userText)||null;
+      var priceMatch=matchPriceData(userText);
+      if(priceMatch){
+        hideTypingAndShow('Voor <strong>'+priceMatch.label+'</strong> rekenen wij indicatief <strong>'+priceMatch.range+'</strong> incl. BTW<br><small style="color:var(--muted);">('+priceMatch.note+')</small>',true);
+      } else if(faq){
+        hideTypingAndShow(faq.answer,true);
+      } else {
+        hideTypingAndShow('Excuses, er is even een storing. Probeer het opnieuw of bel ons direct.',true);
+      }
+    } finally {
+      aiPending=false;inp.disabled=false;sendBtn.disabled=false;inp.focus();
+    }
+  }
+
+  function sendMsg(text,matchedFaq){
+    var trimmed=text.trim();if(!trimmed||aiPending) return;
+    addUserMsg(trimmed);inp.value='';
+
+    if(RE_GREET.test(trimmed)){
+      addBotMsg('Hallo! Waarmee kan ik u helpen? Stel gerust uw vraag.',false);
+      return;
+    }
+    if(RE_THANKS.test(trimmed)){
+      addBotMsg('Graag gedaan! Nog andere vragen?',false);
+      lastContext=null;return;
+    }
+    if(RE_NO.test(trimmed)&&lastContext){
+      addBotMsg('Geen probleem. Heeft u een andere vraag?',false);
+      lastContext=null;return;
+    }
+
+    if(matchedFaq){
+      lastContext=matchedFaq.id;
+      if(matchedFaq.id==='services'){
+        addBotMsg('Wij bieden:<br>• Noodloodgieters (24/7)<br>• Lekdetectie &amp; reparatie<br>• Afvoer ontstopping<br>• Ketel reparatie &amp; onderhoud<br><br>Over welke dienst wilt u een prijsindicatie?',false,buildPriceChips());
+        return;
+      }
+      if(matchedFaq.id==='availability'){
+        addBotMsg(matchedFaq.answer+'<br><br>Heeft u een <strong>noodgeval</strong> of wilt u een <strong>afspraak plannen</strong>?',false);
+        return;
+      }
+      if(matchedFaq.id==='booking'){
+        addBotMsg('Een afspraak maken gaat het snelst telefonisch. Voor welke klus heeft u iemand nodig?',false);
+        return;
+      }
+      addBotMsg(matchedFaq.answer,true);
+      return;
+    }
+
+    callAI(trimmed);
+  }
+
+  btn.addEventListener('click',togglePanel);
+  closeBtn.addEventListener('click',togglePanel);
+  sendBtn.addEventListener('click',function(){sendMsg(inp.value);});
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();sendMsg(inp.value);}});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&opened) togglePanel();});
+})();
 </script>

@@ -14,7 +14,9 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const gatewayUrl = import.meta.env.CF_AI_GATEWAY_URL;
+    const groqUrl = gatewayUrl || 'https://api.groq.com/openai/v1/chat/completions';
+    const response = await fetch(groqUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
