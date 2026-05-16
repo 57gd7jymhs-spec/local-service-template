@@ -1,26 +1,24 @@
 import type { APIRoute } from 'astro';
 import { client } from '../../config/client';
 
-export const POST: APIRoute = async (context) => {
-  const { request, locals } = context;
+export const POST: APIRoute = async ({ request }) => {
   const { messages } = await request.json();
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
-    return new Response(JSON.stringify({ error: 'messages required' }), { status: 400 });
+    return new Response(JSON.stringify({ error: 'messages_required' }), { status: 400 });
   }
 
-  // Cloudflare Pages runtime secrets live in locals.runtime.env, not import.meta.env
-  const runtimeEnv = (locals as any)?.runtime?.env ?? {};
-  const apiKey = runtimeEnv.GROQ_API_KEY ?? import.meta.env.GROQ_API_KEY;
+  const apiKey = import.meta.env.GROQ_API_KEY;
 
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: 'not_configured' }), { status: 500 });
+    return new Response(JSON.stringify({ error: 'no_api_key' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   try {
-    const gatewayUrl = runtimeEnv.CF_AI_GATEWAY_URL ?? import.meta.env.CF_AI_GATEWAY_URL;
-    const groqUrl = gatewayUrl || 'https://api.groq.com/openai/v1/chat/completions';
-    const response = await fetch(groqUrl, {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,13 +37,22 @@ export const POST: APIRoute = async (context) => {
 
     const data = await response.json();
     const text = data.choices?.[0]?.message?.content;
-    if (!text) return new Response(JSON.stringify({ error: 'empty_response', raw: data }), { status: 500 });
+
+    if (!text) {
+      return new Response(JSON.stringify({ error: 'empty_response', status: response.status, raw: data }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
     return new Response(JSON.stringify({ reply: text }), {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : 'unknown';
-    return new Response(JSON.stringify({ error: 'ai_unavailable', detail: msg }), { status: 500 });
+    const msg = e instanceof Error ? e.message : String(e);
+    return new Response(JSON.stringify({ error: 'fetch_failed', detail: msg }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 };
