@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 import { client } from '../../config/client';
 
 export const POST: APIRoute = async ({ request }) => {
@@ -8,7 +9,7 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(JSON.stringify({ error: 'messages_required' }), { status: 400 });
   }
 
-  const apiKey = import.meta.env.GROQ_API_KEY;
+  const apiKey = (env as any).GROQ_API_KEY;
 
   if (!apiKey) {
     return new Response(JSON.stringify({ error: 'no_api_key' }), {
