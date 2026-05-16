@@ -12,10 +12,24 @@ const iconPaths: Record<string, string> = {
   check:  '<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>',
 };
 
-// Extract numeric part from value string for counter animation
-function extractNum(val: string): number | null {
-  const n = parseInt(val.replace(/[^0-9]/g, ''), 10);
-  return isNaN(n) ? null : n;
+// Extract the animatable integer and suffix from a trust-strip value string.
+// Dutch thousands: "4.800+" → {num:4800, suffix:"+"}  |  "45 min" → {num:45, suffix:" min"}
+// Decimals like "4.9" and plain text like "Gratis" → null (no animation, shown as-is)
+function extractNum(val: string): { num: number; suffix: string } | null {
+  // Dutch thousands-formatted: digit(s) + one or more groups of .NNN
+  const thousands = val.match(/^(\d+(?:\.\d{3})+)(.*)$/);
+  if (thousands) {
+    const n = parseInt(thousands[1].replace(/\./g, ''), 10);
+    return isNaN(n) ? null : { num: n, suffix: thousands[2] };
+  }
+  // Plain integer (no dots): "45 min", "8 jr", "7 dagen"
+  const plain = val.match(/^(\d+)(.*)$/);
+  if (plain) {
+    const n = parseInt(plain[1], 10);
+    return isNaN(n) ? null : { num: n, suffix: plain[2] };
+  }
+  // Decimals ("4.9"), text ("Gratis"), ranges ("< 45 min") → show as-is
+  return null;
 }
 ---
 
@@ -39,12 +53,11 @@ function extractNum(val: string): number | null {
   <div class="wrap">
     <div class="trust-grid">
       {client.trustItems.map((item, i) => {
-        const num = extractNum(item.value);
-        const suffix = num !== null ? item.value.replace(String(num), '') : '';
+        const parsed = extractNum(item.value);
         return (
           <div class="trust-card" data-reveal data-delay={String(i + 1)}
-               data-count={num !== null ? String(num) : undefined}
-               data-suffix={num !== null ? suffix : undefined}>
+               data-count={parsed ? String(parsed.num) : undefined}
+               data-suffix={parsed ? parsed.suffix : undefined}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
                  set:html={iconPaths[item.icon] ?? iconPaths.bolt} />
             <div class="trust-number">{item.value}</div>
