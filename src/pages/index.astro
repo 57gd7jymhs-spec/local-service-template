@@ -3,6 +3,7 @@ import BaseLayout from '../components/layout/BaseLayout.astro';
 import HeroVideo from '../components/sections/hero/HeroVideo.astro';
 import HeroSplit from '../components/sections/hero/HeroSplit.astro';
 import HeroMinimal from '../components/sections/hero/HeroMinimal.astro';
+import HeroPhone from '../components/sections/hero/HeroPhone.astro';
 import Marquee from '../components/sections/Marquee.astro';
 import TrustStrip from '../components/sections/TrustStrip.astro';
 import ServicesGrid from '../components/sections/services/ServicesGrid.astro';
@@ -11,36 +12,46 @@ import BeforeAfterSlider from '../components/sections/gallery/BeforeAfterSlider.
 import TestimonialsRow from '../components/sections/testimonials/TestimonialsRow.astro';
 import TestimonialsCarousel from '../components/sections/testimonials/TestimonialsCarousel.astro';
 import WhyUs from '../components/sections/WhyUs.astro';
+import ProcessSteps from '../components/sections/ProcessSteps.astro';
+import ServiceAreas from '../components/sections/ServiceAreas.astro';
+import GalleryGrid from '../components/sections/GalleryGrid.astro';
 import FaqAccordion from '../components/sections/faq/FaqAccordion.astro';
 import CtaBanner from '../components/sections/cta/CtaBanner.astro';
 import CtaSplit from '../components/sections/cta/CtaSplit.astro';
 import Chatbot from '../components/ui/Chatbot.astro';
 import { client } from '../config/client';
 
-const heroVariant        = client.pages.home.hero;
-const sections           = client.pages.home.sections;
-const servicesVariant    = client.sections.services.variant;
+const heroVariant         = client.pages.home.hero;
+const sections            = client.pages.home.sections;
+const servicesVariant     = client.sections.services.variant;
 const testimonialsVariant = client.sections.testimonials.variant;
-const ctaVariant         = client.sections.cta.variant;
-const hasBeforeAfter     = client.beforeAfter.length > 0;
-const hasFaqPage         = client.pages.faq;
+const ctaVariant          = client.sections.cta.variant;
+const hasBeforeAfter      = client.beforeAfter.length > 0;
+const hasFaqPage          = client.pages.faq;
+const hasGallery          = (client.gallery?.photos?.length ?? 0) > 0;
+const hasServiceAreas     = (client.serviceAreas?.areas?.length ?? 0) > 0;
+const hasProcess          = (client.process?.steps?.length ?? 0) > 0;
 ---
 
 <BaseLayout>
   {heroVariant === 'video'   && <HeroVideo />}
   {heroVariant === 'split'   && <HeroSplit />}
   {heroVariant === 'minimal' && <HeroMinimal />}
+  {heroVariant === 'phone'   && <HeroPhone />}
 
   <Marquee />
 
   {sections.map(section => {
-    if (section === 'trust')        return <TrustStrip />;
-    if (section === 'services')     return servicesVariant === 'list' ? <ServicesList /> : <ServicesGrid />;
-    if (section === 'before-after') return hasBeforeAfter ? <BeforeAfterSlider /> : null;
-    if (section === 'testimonials') return testimonialsVariant === 'carousel' ? <TestimonialsCarousel /> : <TestimonialsRow />;
-    if (section === 'why-us')       return <WhyUs />;
-    if (section === 'faq-preview')  return hasFaqPage ? <FaqAccordion preview={true} /> : null;
-    if (section === 'cta')          return ctaVariant === 'split' ? <CtaSplit /> : <CtaBanner />;
+    if (section === 'trust')         return <TrustStrip />;
+    if (section === 'services')      return servicesVariant === 'list' ? <ServicesList /> : <ServicesGrid />;
+    if (section === 'before-after')  return hasBeforeAfter ? <BeforeAfterSlider /> : null;
+    if (section === 'testimonials')  return testimonialsVariant === 'carousel' ? <TestimonialsCarousel /> : <TestimonialsRow />;
+    if (section === 'why-us')        return <WhyUs />;
+    if (section === 'process')       return hasProcess ? <ProcessSteps /> : null;
+    if (section === 'service-areas') return hasServiceAreas ? <ServiceAreas /> : null;
+    if (section === 'gallery-grid')  return hasGallery ? <GalleryGrid /> : null;
+    if (section === 'faq-preview')   return hasFaqPage ? <FaqAccordion preview={true} /> : null;
+    if (section === 'cta')           return ctaVariant === 'split' ? <CtaSplit /> : <CtaBanner />;
     return null;
   })}
 

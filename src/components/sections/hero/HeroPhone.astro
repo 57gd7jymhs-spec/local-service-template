@@ -1,0 +1,146 @@
+---
+/**
+ * HeroPhone — ultra-minimal hero for maximum phone conversion.
+ * Puts the phone number front and center. Best for emergency trades
+ * where the visitor's only goal is to call.
+ * Variant: "phone" in client.pages.home.hero
+ */
+import { client } from '../../../config/client';
+
+const { brand, hero, trustItems } = client;
+const phoneClean = brand.phone.replace(/\s/g, '');
+---
+
+<style>
+.hero-phone {
+  min-height: 100vh;
+  background: var(--navy);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 7rem 1.5rem 4rem;
+  position: relative; overflow: hidden;
+}
+/* Subtle radial gradient */
+.hero-phone::before {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(24,71,237,.18) 0%, transparent 70%);
+}
+.grid-bg {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px);
+  background-size: 56px 56px; opacity: .035;
+}
+.hero-phone-inner {
+  position: relative; z-index: 1;
+  max-width: 48rem; width: 100%;
+}
+
+/* Badge */
+.trust-badge {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 9999px; padding: .375rem 1rem;
+  font-size: .8125rem; font-weight: 500; color: rgba(255,255,255,.75);
+  margin-bottom: 2rem;
+  animation: fadeUp .5s .1s var(--ease) both;
+}
+.live-wrap { position: relative; width: .5rem; height: .5rem; flex-shrink: 0; }
+.live-core, .live-ring { position: absolute; inset: 0; border-radius: 50%; background: #10b981; }
+.live-ring { opacity: .75; animation: ping 1.5s ease-in-out infinite; }
+
+/* Heading */
+.hero-tagline {
+  font-size: clamp(1rem, 2.5vw, 1.375rem);
+  font-weight: 600; color: rgba(255,255,255,.55);
+  letter-spacing: .04em; text-transform: uppercase;
+  margin: 0 0 .75rem;
+  animation: fadeUp .5s .15s var(--ease) both;
+}
+.hero-name {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 900; color: #fff;
+  letter-spacing: -.04em; line-height: 1.05;
+  margin: 0 0 2rem;
+  animation: fadeUp .5s .2s var(--ease) both;
+}
+
+/* Phone CTA — the star of this layout */
+.phone-cta {
+  display: inline-flex; flex-direction: column; align-items: center;
+  text-decoration: none;
+  animation: fadeUp .5s .3s var(--ease) both;
+}
+.phone-label {
+  font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: rgba(255,255,255,.45); margin-bottom: .375rem;
+}
+.phone-number {
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  font-weight: 900; color: var(--blue);
+  letter-spacing: -.04em; line-height: 1;
+  transition: color .2s;
+}
+.phone-cta:hover .phone-number { color: #fff; }
+.phone-underline {
+  width: 100%; height: 3px; background: var(--blue); border-radius: 2px;
+  margin-top: .5rem; transform-origin: left;
+  transition: transform .3s var(--ease);
+  transform: scaleX(0);
+}
+.phone-cta:hover .phone-underline { transform: scaleX(1); }
+
+/* Sub text */
+.hero-sub {
+  font-size: 1rem; color: rgba(255,255,255,.5);
+  line-height: 1.7; margin: 2rem auto 0;
+  max-width: 34rem;
+  animation: fadeUp .5s .4s var(--ease) both;
+}
+
+/* Trust pills */
+.trust-pills {
+  display: flex; flex-wrap: wrap; gap: .625rem; justify-content: center;
+  margin-top: 2.5rem;
+  animation: fadeUp .5s .5s var(--ease) both;
+}
+.trust-pill {
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 9999px; padding: .375rem 1rem;
+  font-size: .8125rem; color: rgba(255,255,255,.7); font-weight: 500;
+  display: inline-flex; align-items: center; gap: .375rem;
+}
+.trust-pill::before { content: '✓'; color: #10b981; font-weight: 700; }
+</style>
+
+<header class="hero-phone">
+  <div class="grid-bg"></div>
+  <div class="hero-phone-inner">
+
+    <div class="trust-badge">
+      <span class="live-wrap"><span class="live-core"></span><span class="live-ring"></span></span>
+      {hero.trustBadge}
+    </div>
+
+    <p class="hero-tagline">{brand.tagline}</p>
+    <h1 class="hero-name">{brand.name}</h1>
+
+    <a href={`tel:${phoneClean}`} class="phone-cta" aria-label={`Bel ${brand.name} op ${brand.phone}`}>
+      <span class="phone-label">Bel ons direct</span>
+      <span class="phone-number">{brand.phone}</span>
+      <span class="phone-underline" aria-hidden="true"></span>
+    </a>
+
+    <p class="hero-sub">{hero.subtext}</p>
+
+    <div class="trust-pills">
+      {trustItems.slice(0, 4).map(item => (
+        <span class="trust-pill">{item.value} {item.label}</span>
+      ))}
+    </div>
+
+  </div>
+</header>

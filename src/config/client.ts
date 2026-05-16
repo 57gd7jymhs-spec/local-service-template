@@ -10,12 +10,15 @@ export const client = {
   brand: {
     name:         "Dropwork",
     tagline:      "Loodgieters",
-    niche:        "plumber" as "plumber" | "barber" | "roofer" | "electrician" | "generic",
+    niche:        "plumber" as "plumber" | "barber" | "roofer" | "electrician" | "painter" | "generic",
     phone:        "+32 500 00 00",
     email:        "info@dropwork.be",
     location:     "Brugge",
     logo:         "/images/logo.png",          // positive (dark) version
     logoNegative: "/images/logo-negative.png", // white version for dark backgrounds
+    // Get a free key at web3forms.com — one key per client email address.
+    // Leave empty ("") to hide the form and show phone + mailto only.
+    web3formsKey: "",
   },
 
   // ── Theme ─────────────────────────────────────────────────────────────
@@ -41,18 +44,21 @@ export const client = {
       // "video"   → HeroVideo   (looping video background, rotating headline — plumbers/roofers)
       // "split"   → HeroSplit   (image left / text right — barbers/salons)
       // "minimal" → HeroMinimal (centered text only — cleanest, fastest)
-      hero: "video" as "video" | "split" | "minimal",
+      // "phone"   → HeroPhone   (phone number front-and-center — max conversion, emergency trades)
+      hero: "video" as "video" | "split" | "minimal" | "phone",
 
       // Ordered sections that appear below the hero.
       // Remove a key to hide that section. Reorder to change sequence.
       sections: [
-        "trust",        // TrustStrip — 4 stat cards
-        "services",     // ServicesGrid or ServicesList (controlled by sections.services.variant)
-        "before-after", // BeforeAfterSlider (hidden automatically if beforeAfter[] is empty)
-        "testimonials", // TestimonialsRow or TestimonialsCarousel
-        "why-us",       // WhyUs — numbered differentiators
-        "cta",          // CtaBanner or CtaSplit
-      ] as Array<"trust" | "services" | "before-after" | "testimonials" | "why-us" | "about" | "faq-preview" | "cta">,
+        "trust",         // TrustStrip — 4 stat cards
+        "services",      // ServicesGrid or ServicesList (controlled by sections.services.variant)
+        "process",       // ProcessSteps — "How we work" (4 steps)
+        "before-after",  // BeforeAfterSlider (hidden automatically if beforeAfter[] is empty)
+        "testimonials",  // TestimonialsRow or TestimonialsCarousel
+        "why-us",        // WhyUs — numbered differentiators
+        "service-areas", // ServiceAreas — cities/regions covered
+        "cta",           // CtaBanner or CtaSplit
+      ] as Array<"trust" | "services" | "before-after" | "testimonials" | "why-us" | "process" | "service-areas" | "gallery-grid" | "about" | "faq-preview" | "cta">,
     },
     services:  true,
     about:     true,
@@ -322,6 +328,64 @@ export const client = {
       image:  string;
       badges: string[];
     }>,
+  },
+
+  // ── Process steps ────────────────────────────────────────────────────
+  // Drives ProcessSteps section. Shows "How we work" as numbered steps.
+  // Set to null or empty steps[] to hide the section.
+  process: {
+    eyebrow: "Hoe werkt het",
+    heading: "Uw probleem opgelost in 4 stappen",
+    subtext: "Van uw telefoontje tot een gegarandeerde oplossing — snel, transparant en zonder verrassingen.",
+    steps: [
+      {
+        number: "01",
+        icon: "phone",
+        title: "Bel ons",
+        body: "Vertel ons uw probleem. We zijn 24/7 bereikbaar. Gemiddeld neemt een gecertificeerde loodgieter in minder dan 30 seconden op.",
+      },
+      {
+        number: "02",
+        icon: "clock",
+        title: "Snelle aankomst",
+        body: "Een monteur vertrekt onmiddellijk richting u. Gemiddeld zijn wij binnen 45 minuten ter plaatse — ook in het weekend en 's nachts.",
+      },
+      {
+        number: "03",
+        icon: "document",
+        title: "Diagnose & vaste prijs",
+        body: "We inspecteren het probleem en geven u een schriftelijke vaste prijs vóór we beginnen. Geen verborgen kosten, geen verrassingen.",
+      },
+      {
+        number: "04",
+        icon: "shield",
+        title: "Opgelost & gegarandeerd",
+        body: "We lossen het op dezelfde dag op en ruimen netjes op. Alle werken zijn gedekt door onze garantie. Lukt het niet? U betaalt niets.",
+      },
+    ] as Array<{ number: string; icon: string; title: string; body: string }>,
+  },
+
+  // ── Service areas ─────────────────────────────────────────────────────
+  // Drives ServiceAreas section. Lists the cities/regions the business covers.
+  // Set areas: [] to hide the section.
+  serviceAreas: {
+    eyebrow: "Ons werkgebied",
+    heading: "Actief in de hele regio",
+    subtext: "Bel ons — wij rijden er naartoe.",
+    areas: [
+      "Brugge", "Gent", "Kortrijk", "Roeselare", "Oostende",
+      "Damme", "Torhout", "Tielt", "Menen", "Waregem",
+      "Izegem", "Diksmuide", "Veurne",
+    ],
+  },
+
+  // ── Gallery grid ──────────────────────────────────────────────────────
+  // Drives GalleryGrid section (photo grid of completed work).
+  // Set photos: [] to hide the section entirely.
+  gallery: {
+    eyebrow: "Ons werk",
+    heading: "Recent afgewerkte projecten",
+    photos: [] as Array<{ src: string; caption: string; tag?: string }>,
   },
 
   // ── FAQ ───────────────────────────────────────────────────────────────

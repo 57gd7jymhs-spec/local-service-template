@@ -186,13 +186,39 @@ local-service-template/
 
 ## Section variants by niche
 
-| Section | Plumber | Barber | Roofer |
-|---|---|---|---|
-| Hero | HeroVideo | HeroSplit | HeroMinimal |
-| Services | ServicesGrid | ServicesList | ServicesGrid |
-| Social proof | TestimonialsRow | TestimonialsCarousel | BeforeAfterSlider |
-| CTA | CtaBanner ("Bel Nu") | CtaSplit ("Book Now") | CtaBanner ("Get Quote") |
-| AI Chat | Route to calling | Route to booking | Route to quote |
+| Section | Plumber | Electrician | Roofer | Painter |
+|---|---|---|---|---|
+| Hero | HeroVideo | HeroPhone | HeroMinimal | HeroSplit |
+| Services | ServicesGrid | ServicesGrid | ServicesGrid | ServicesList |
+| Social proof | TestimonialsRow | TestimonialsCarousel | BeforeAfterSlider | GalleryGrid |
+| Process | ProcessSteps | ProcessSteps | ProcessSteps | ProcessSteps |
+| Service areas | ServiceAreas | ServiceAreas | ServiceAreas | ServiceAreas |
+| CTA | CtaBanner | CtaBanner | CtaBanner | CtaSplit |
+| AI Chat | Route to calling | Route to calling | Route to quote | Route to quote |
+
+## Section variants available
+
+| Section key | Component(s) | When to use |
+|---|---|---|
+| `trust` | TrustStrip | Always — 4 stat cards |
+| `services` | ServicesGrid / ServicesList | Always — `variant: "grid"` or `"list"` |
+| `process` | ProcessSteps | Trades where trust-building matters (all of them) |
+| `before-after` | BeforeAfterSlider | When client has before/after photo pairs |
+| `gallery-grid` | GalleryGrid | When client has individual project photos |
+| `testimonials` | TestimonialsRow / TestimonialsCarousel | Always — `variant: "row"` or `"carousel"` |
+| `why-us` | WhyUs | Always — 4 numbered differentiators |
+| `service-areas` | ServiceAreas | Multi-city service area |
+| `faq-preview` | FaqAccordion | When FAQ page is enabled |
+| `cta` | CtaBanner / CtaSplit | Always — final conversion section |
+
+## Hero variants
+
+| Variant | Component | Best for |
+|---|---|---|
+| `"video"` | HeroVideo | Plumbers, roofers — dramatic visual impact |
+| `"split"` | HeroSplit | Painters, renovators — image-forward |
+| `"minimal"` | HeroMinimal | Clean, fast — any niche |
+| `"phone"` | HeroPhone | Emergency services — phone number front-and-center |
 
 ---
 

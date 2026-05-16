@@ -51,6 +51,47 @@ const { brandName, phone, logo } = Astro.props;
 .nav-phone { display:none; }
 @media(min-width:640px){ .nav-phone{display:block} }
 @media(max-width:768px){ .nav-links{display:none} }
+
+/* Hamburger */
+.nav-burger {
+  display:none;
+  width:2.25rem;height:2.25rem;
+  align-items:center;justify-content:center;
+  background:none;border:none;cursor:pointer;
+  padding:.25rem;border-radius:.5rem;
+  color:var(--navy);transition:color .25s;
+}
+#nav.scrolled .nav-burger { color:#fff; }
+@media(max-width:768px){ .nav-burger{display:flex} }
+
+/* Mobile drawer */
+.nav-drawer {
+  display:none;
+  position:fixed;inset:0;z-index:899;
+  background:rgba(13,30,92,.97);backdrop-filter:blur(16px);
+  flex-direction:column;justify-content:center;align-items:center;gap:2rem;
+  padding:2rem;
+}
+.nav-drawer.open { display:flex; }
+.nav-drawer a {
+  font-size:1.75rem;font-weight:700;color:#fff;
+  text-decoration:none;letter-spacing:-.02em;
+  opacity:.85;transition:opacity .15s;
+}
+.nav-drawer a:hover { opacity:1; }
+.nav-drawer-close {
+  position:absolute;top:5.5rem;right:1.5rem;
+  background:rgba(255,255,255,.1);border:none;cursor:pointer;
+  width:2.75rem;height:2.75rem;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:#fff;
+}
+.nav-drawer-phone {
+  margin-top:1rem;
+  display:flex;align-items:center;gap:.625rem;
+  background:var(--blue);color:#fff !important;opacity:1 !important;
+  padding:1rem 2rem;border-radius:.875rem;font-size:1.25rem !important;
+  box-shadow:0 8px 24px rgba(24,71,237,.4);
+}
 </style>
 
 <div id="progress-bar"></div>
@@ -71,7 +112,25 @@ const { brandName, phone, logo } = Astro.props;
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1.04h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 15.92z"/></svg>
     <span class="nav-phone">{phone}</span>
   </a>
+  <button class="nav-burger" id="navBurger" aria-label="Menu openen" aria-expanded="false">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
 </nav>
+
+<div class="nav-drawer" id="navDrawer" role="dialog" aria-modal="true" aria-label="Navigatie">
+  <button class="nav-drawer-close" id="navDrawerClose" aria-label="Menu sluiten">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  {client.nav.map(link => (
+    <a href={link.href} class="nav-drawer-link">{link.label}</a>
+  ))}
+  <a href={`tel:${phone.replace(/\s/g,'')}`} class="nav-drawer-phone">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1.04h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 15.92z"/></svg>
+    {phone}
+  </a>
+</div>
 
 <div class="sticky-mobile">
   <a href={`tel:${phone.replace(/\s/g,'')}`}>
@@ -90,6 +149,18 @@ window.addEventListener('scroll', () => {
   if (nav) nav.classList.toggle('scrolled', window.scrollY > 60);
   if (stickyBar) stickyBar.classList.toggle('show', window.scrollY > 420);
 }, { passive: true });
+
+// Mobile drawer
+const burger  = document.getElementById('navBurger');
+const drawer  = document.getElementById('navDrawer');
+const drawerClose = document.getElementById('navDrawerClose');
+function openDrawer()  { drawer?.classList.add('open');  burger?.setAttribute('aria-expanded','true');  document.body.style.overflow='hidden'; }
+function closeDrawer() { drawer?.classList.remove('open');burger?.setAttribute('aria-expanded','false'); document.body.style.overflow=''; }
+burger?.addEventListener('click', openDrawer);
+drawerClose?.addEventListener('click', closeDrawer);
+drawer?.addEventListener('click', e => { if (e.target === drawer) closeDrawer(); });
+document.querySelectorAll('.nav-drawer-link').forEach(a => a.addEventListener('click', closeDrawer));
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeDrawer(); });
 
 const revealObs = new IntersectionObserver(entries => {
   entries.forEach(e => {
