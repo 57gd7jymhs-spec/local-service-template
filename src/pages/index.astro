@@ -6,14 +6,24 @@ import HeroMinimal from '../components/sections/hero/HeroMinimal.astro';
 import Marquee from '../components/sections/Marquee.astro';
 import TrustStrip from '../components/sections/TrustStrip.astro';
 import ServicesGrid from '../components/sections/services/ServicesGrid.astro';
+import ServicesList from '../components/sections/services/ServicesList.astro';
 import BeforeAfterSlider from '../components/sections/gallery/BeforeAfterSlider.astro';
-import Reviews from '../components/sections/Reviews.astro';
+import TestimonialsRow from '../components/sections/testimonials/TestimonialsRow.astro';
+import TestimonialsCarousel from '../components/sections/testimonials/TestimonialsCarousel.astro';
 import WhyUs from '../components/sections/WhyUs.astro';
+import FaqAccordion from '../components/sections/faq/FaqAccordion.astro';
 import CtaBanner from '../components/sections/cta/CtaBanner.astro';
+import CtaSplit from '../components/sections/cta/CtaSplit.astro';
 import Chatbot from '../components/ui/Chatbot.astro';
 import { client } from '../config/client';
 
-const heroVariant = client.pages.home.hero;
+const heroVariant        = client.pages.home.hero;
+const sections           = client.pages.home.sections;
+const servicesVariant    = client.sections.services.variant;
+const testimonialsVariant = client.sections.testimonials.variant;
+const ctaVariant         = client.sections.cta.variant;
+const hasBeforeAfter     = client.beforeAfter.length > 0;
+const hasFaqPage         = client.pages.faq;
 ---
 
 <BaseLayout>
@@ -22,12 +32,17 @@ const heroVariant = client.pages.home.hero;
   {heroVariant === 'minimal' && <HeroMinimal />}
 
   <Marquee />
-  <TrustStrip />
-  <ServicesGrid />
-  <BeforeAfterSlider />
-  <Reviews />
-  <WhyUs />
-  <CtaBanner />
+
+  {sections.map(section => {
+    if (section === 'trust')        return <TrustStrip />;
+    if (section === 'services')     return servicesVariant === 'list' ? <ServicesList /> : <ServicesGrid />;
+    if (section === 'before-after') return hasBeforeAfter ? <BeforeAfterSlider /> : null;
+    if (section === 'testimonials') return testimonialsVariant === 'carousel' ? <TestimonialsCarousel /> : <TestimonialsRow />;
+    if (section === 'why-us')       return <WhyUs />;
+    if (section === 'faq-preview')  return hasFaqPage ? <FaqAccordion preview={true} /> : null;
+    if (section === 'cta')          return ctaVariant === 'split' ? <CtaSplit /> : <CtaBanner />;
+    return null;
+  })}
 
   <Chatbot />
 </BaseLayout>

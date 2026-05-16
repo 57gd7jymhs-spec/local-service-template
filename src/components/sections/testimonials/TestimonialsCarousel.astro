@@ -1,0 +1,106 @@
+---
+import { client } from '../../../config/client';
+
+const t = client.sections.testimonials;
+const items = client.testimonials;
+---
+
+<style>
+.carousel-section { padding:5rem 1.5rem; background:var(--surface); }
+.carousel-wrap { max-width:680px;margin:0 auto; }
+.carousel-track-outer { overflow:hidden;border-radius:1.25rem; }
+.carousel-track { display:flex;transition:transform .45s cubic-bezier(.4,0,.2,1); }
+.carousel-slide {
+  min-width:100%;padding:2.5rem 2.5rem 2rem;background:#fff;
+  border:1px solid var(--border);border-radius:1.25rem;
+  display:flex;flex-direction:column;gap:1.25rem;
+}
+.carousel-stars { color:#f59e0b;font-size:1.1rem;letter-spacing:.06em; }
+.carousel-quote { font-size:1.0625rem;color:var(--navy);line-height:1.7;font-style:italic;margin:0; }
+.carousel-reviewer { display:flex;align-items:center;gap:.875rem; }
+.carousel-avatar {
+  width:42px;height:42px;border-radius:50%;background:var(--blue);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:.875rem;font-weight:800;flex-shrink:0;
+}
+.carousel-reviewer-name { font-size:.9375rem;font-weight:700;color:var(--navy); }
+.carousel-reviewer-loc  { font-size:.8125rem;color:var(--muted); }
+.carousel-dots { display:flex;justify-content:center;gap:.5rem;margin-top:1.75rem; }
+.carousel-dot {
+  width:.5rem;height:.5rem;border-radius:50%;background:var(--border);border:none;cursor:pointer;
+  transition:background .2s,transform .2s;padding:0;
+}
+.carousel-dot.active { background:var(--blue);transform:scale(1.3); }
+@media(max-width:480px){ .carousel-slide{ padding:2rem 1.5rem 1.5rem; } }
+</style>
+
+<section class="carousel-section" id="reviews">
+  <div class="wrap">
+    <div class="section-header" data-reveal>
+      <span class="eyebrow">{t.eyebrow}</span>
+      <h2>{t.heading}</h2>
+    </div>
+    <div class="carousel-wrap" data-reveal data-delay="2">
+      <div class="carousel-track-outer">
+        <div class="carousel-track" id="carouselTrack">
+          {items.map(item => (
+            <div class="carousel-slide">
+              <div class="carousel-stars">{'★'.repeat(item.rating)}</div>
+              <p class="carousel-quote">"{item.text}"</p>
+              <div class="carousel-reviewer">
+                <div class="carousel-avatar">{item.name.charAt(0)}</div>
+                <div>
+                  <div class="carousel-reviewer-name">{item.name}</div>
+                  <div class="carousel-reviewer-loc">{item.location}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div class="carousel-dots" id="carouselDots" role="tablist" aria-label="Getuigenissen navigatie">
+        {items.map((_, i) => (
+          <button class={`carousel-dot${i === 0 ? ' active' : ''}`}
+                  role="tab" aria-selected={i === 0 ? 'true' : 'false'}
+                  aria-label={`Getuigenis ${i + 1}`} data-index={String(i)} />
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  const track = document.getElementById('carouselTrack') as HTMLElement | null;
+  const dotsEl = document.getElementById('carouselDots');
+  if (!track || !dotsEl) return;
+
+  const dots = Array.from(dotsEl.querySelectorAll<HTMLButtonElement>('.carousel-dot'));
+  let current = 0;
+  let timer: ReturnType<typeof setInterval>;
+  const total = dots.length;
+
+  function goTo(n: number) {
+    current = (n + total) % total;
+    track.style.transform = `translateX(-${current * 100}%)`;
+    dots.forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+      d.setAttribute('aria-selected', i === current ? 'true' : 'false');
+    });
+  }
+
+  function startAuto() {
+    timer = setInterval(() => goTo(current + 1), 4000);
+  }
+
+  function stopAuto() { clearInterval(timer); }
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => { stopAuto(); goTo(i); startAuto(); });
+  });
+
+  track.parentElement?.addEventListener('mouseenter', stopAuto);
+  track.parentElement?.addEventListener('mouseleave', startAuto);
+
+  startAuto();
+})();
+</script>

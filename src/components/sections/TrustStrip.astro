@@ -1,5 +1,21 @@
 ---
 import { client } from '../../config/client';
+
+const iconPaths: Record<string, string> = {
+  clock:  '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  users:  '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>',
+  badge:  '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  bolt:   '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  euro:   '<path d="M4 10h12M4 14h12M19.5 9.5A7.5 7.5 0 104 14"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  star:   '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+};
+
+// Extract numeric part from value string for counter animation
+function extractNum(val: string): number | null {
+  const n = parseInt(val.replace(/[^0-9]/g, ''), 10);
+  return isNaN(n) ? null : n;
+}
 ---
 
 <style>
@@ -21,26 +37,20 @@ import { client } from '../../config/client';
 <section class="trust-section" id="vertrouwen">
   <div class="wrap">
     <div class="trust-grid">
-      <div class="trust-card" data-reveal data-delay="1">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <div class="trust-number" data-count="45" data-suffix=" min">45 min</div>
-        <div class="trust-label">Gemiddelde aankomsttijd</div>
-      </div>
-      <div class="trust-card" data-reveal data-delay="2">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        <div class="trust-number" data-count="4800" data-suffix="+">4.800+</div>
-        <div class="trust-label">Tevreden klanten</div>
-      </div>
-      <div class="trust-card" data-reveal data-delay="3">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <div class="trust-number" data-count="15" data-suffix=" jr">15 jr</div>
-        <div class="trust-label">Gecertificeerde ervaring</div>
-      </div>
-      <div class="trust-card" data-reveal data-delay="4">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-        <div class="trust-number">Gratis</div>
-        <div class="trust-label">Als het niet lukt — onze garantie</div>
-      </div>
+      {client.trustItems.map((item, i) => {
+        const num = extractNum(item.value);
+        const suffix = num !== null ? item.value.replace(String(num), '') : '';
+        return (
+          <div class="trust-card" data-reveal data-delay={String(i + 1)}
+               data-count={num !== null ? String(num) : undefined}
+               data-suffix={num !== null ? suffix : undefined}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                 set:html={iconPaths[item.icon] ?? iconPaths.bolt} />
+            <div class="trust-number">{item.value}</div>
+            <div class="trust-label">{item.label}</div>
+          </div>
+        );
+      })}
     </div>
   </div>
 </section>
@@ -49,13 +59,13 @@ import { client } from '../../config/client';
 const counterObs = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (!e.isIntersecting) return;
-    const el = e.target;
-    const numEl = el.querySelector('.trust-number');
-    const target = parseInt(el.dataset.count, 10);
-    const suffix = el.dataset.suffix || '';
+    const el = e.target as HTMLElement;
+    const numEl = el.querySelector('.trust-number') as HTMLElement | null;
+    const target = parseInt(el.dataset.count ?? '', 10);
+    const suffix = el.dataset.suffix ?? '';
     if (!target || !numEl) return;
     const dur = 1400, start = performance.now();
-    (function tick(now) {
+    (function tick(now: number) {
       const p = Math.min((now - start) / dur, 1), eased = 1 - Math.pow(1 - p, 3);
       numEl.textContent = Math.round(eased * target).toLocaleString('nl-BE') + suffix;
       if (p < 1) requestAnimationFrame(tick);

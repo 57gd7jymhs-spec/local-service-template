@@ -1,5 +1,8 @@
 ---
 import { client } from '../../../config/client';
+
+const s = client.sections.cta;
+const phone = client.brand.phone.replace(/\s/g, '');
 ---
 
 <style>
@@ -33,12 +36,12 @@ import { client } from '../../../config/client';
   <div class="wrap">
     <div class="cta-inner">
       <div data-reveal>
-        <h2>Hebt u nu een loodgieter nodig?</h2>
-        <p class="cta-sub">Waterschade verdubbelt elke 24 uur. Eén telefoontje stuurt een gecertificeerde loodgieter uw kant op.</p>
+        <h2>{s.heading}</h2>
+        <p class="cta-sub">{s.subtext}</p>
         <div class="cta-actions">
-          <a href={`tel:${client.brand.phone.replace(/\s/g,'')}`} class="btn-cta-call">
+          <a href={`tel:${phone}`} class="btn-cta-call">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1.04h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 15.92z"/></svg>
-            Bel Nu — Gratis
+            {s.ctaLabel}
           </a>
           <button class="btn-cta-copy" id="copyNumBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
@@ -46,29 +49,27 @@ import { client } from '../../../config/client';
           </button>
         </div>
         <div class="cta-assurances">
-          <div class="assurance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Geen verplichting</div>
-          <div class="assurance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Geen voorrijkosten</div>
-          <div class="assurance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 45 min aankomst</div>
-          <div class="assurance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Vaste prijs offerte</div>
+          {s.assurances.map(a => (
+            <div class="assurance">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              {a}
+            </div>
+          ))}
         </div>
       </div>
       <div class="cta-cards">
-        <div class="cta-card">
-          <div class="cta-card-title">Gemiddelde aankomsttijd</div>
-          <div class="cta-card-value">45 min</div>
-          <div class="cta-card-sub">Of 10% korting op uw factuur — gegarandeerd</div>
-        </div>
-        <div class="cta-card">
-          <div class="cta-card-title">Onze belofte</div>
-          <div class="cta-card-value">Gratis</div>
-          <div class="cta-card-sub">Als we het niet oplossen bij het eerste bezoek, betaalt u niets</div>
-        </div>
+        {client.trustItems.slice(0, 2).map(item => (
+          <div class="cta-card">
+            <div class="cta-card-title">{item.label}</div>
+            <div class="cta-card-value">{item.value}</div>
+          </div>
+        ))}
       </div>
     </div>
   </div>
 </section>
 
-<script define:vars={{ phone: client.brand.phone.replace(/\s/g, '') }}>
+<script define:vars={{ phone }}>
 const btn = document.getElementById('copyNumBtn');
 if (btn) {
   btn.addEventListener('click', () => {

@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import FaqAccordion from '../components/sections/faq/FaqAccordion.astro';
+import { client } from '../config/client';
+
+if (!client.pages.faq) {
+  return Astro.redirect('/');
+}
+
+const pageTitle = `FAQ — ${client.brand.name} ${client.brand.tagline}`;
+const pageDesc = `Antwoorden op de meest gestelde vragen over ${client.brand.name} in ${client.brand.location}.`;
+---
+
+<BaseLayout title={pageTitle} description={pageDesc}>
+  <style>
+    .page-hero {
+      background: var(--navy);
+      color: #fff;
+      padding: 8rem 2rem 5rem;
+      text-align: center;
+    }
+    .page-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      letter-spacing: -.04em;
+      margin: 0 0 1rem;
+    }
+    .page-hero p {
+      color: rgba(255,255,255,.7);
+      font-size: 1.1rem;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+    .cta-strip {
+      background: var(--blue);
+      color: #fff;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+    .cta-strip h2 { font-size: clamp(1.5rem,4vw,2.5rem); font-weight:900; margin:0 0 1rem; }
+    .cta-strip p { color:rgba(255,255,255,.8); margin:0 0 2rem; font-size:1.05rem; }
+    .cta-btn {
+      display:inline-flex;align-items:center;gap:.5rem;
+      background:#fff;color:var(--blue);
+      padding:1rem 2.25rem;border-radius:.75rem;
+      font-size:1.05rem;font-weight:700;text-decoration:none;
+      box-shadow:0 8px 24px rgba(0,0,0,.15);
+      transition:opacity .2s,transform .15s;
+    }
+    .cta-btn:hover { opacity:.9;transform:translateY(-2px); }
+  </style>
+
+  <div class="page-hero">
+    <h1>Veelgestelde vragen</h1>
+    <p>Alles wat u wilt weten over onze diensten, prijzen en werkwijze.</p>
+  </div>
+
+  <FaqAccordion />
+
+  <section class="cta-strip">
+    <h2>Vraag niet gevonden?</h2>
+    <p>Bel ons — wij beantwoorden al uw vragen direct.</p>
+    <a href={`tel:${client.brand.phone.replace(/\s/g,'')}`} class="cta-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      Bel {client.brand.phone}
+    </a>
+  </section>
+</BaseLayout>

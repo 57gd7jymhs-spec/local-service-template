@@ -1,0 +1,146 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import FaqAccordion from '../components/sections/faq/FaqAccordion.astro';
+import { client } from '../config/client';
+
+if (!client.pages.emergency) {
+  return Astro.redirect('/');
+}
+
+const pageTitle = `Spoeddienst — ${client.brand.name} ${client.brand.tagline}`;
+const pageDesc = `24/7 spoeddienst van ${client.brand.name} in ${client.brand.location}. Wij zijn snel ter plaatse.`;
+const phone = client.brand.phone.replace(/\s/g, '');
+---
+
+<BaseLayout title={pageTitle} description={pageDesc}>
+  <style>
+    .emergency-hero {
+      background: var(--navy);
+      color: #fff;
+      padding: 8rem 2rem 5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .emergency-hero::before {
+      content: '';
+      position: absolute; top: -8rem; left: 50%; transform: translateX(-50%);
+      width: 32rem; height: 32rem; border-radius: 50%;
+      background: rgba(220,38,38,.15); filter: blur(64px); pointer-events: none;
+    }
+    .emergency-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(220,38,38,.2); border: 1px solid rgba(220,38,38,.4);
+      color: #fca5a5; border-radius: .5rem;
+      font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      padding: .375rem .875rem; margin-bottom: 1.5rem;
+    }
+    .emergency-badge::before { content: ''; width: .5rem; height: .5rem; border-radius: 50%; background: #ef4444; animation: pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+    .emergency-hero h1 {
+      font-size: clamp(2.25rem, 6vw, 4rem);
+      font-weight: 900; letter-spacing: -.04em; margin: 0 0 1rem; line-height: 1.05;
+    }
+    .emergency-hero p {
+      color: rgba(255,255,255,.7); font-size: 1.15rem; max-width: 520px; margin: 0 auto 2.5rem; line-height: 1.6;
+    }
+    .emergency-cta {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2.5rem;
+    }
+    .btn-emergency {
+      display: inline-flex; align-items: center; gap: .625rem;
+      background: #ef4444; color: #fff; font-weight: 700; font-size: 1.125rem;
+      padding: 1.125rem 2.25rem; border-radius: .875rem; text-decoration: none;
+      box-shadow: 0 8px 28px rgba(239,68,68,.4); transition: background .2s, transform .2s;
+    }
+    .btn-emergency:hover { background: #dc2626; transform: translateY(-2px); }
+    .btn-emergency svg { width: 1.25rem; height: 1.25rem; }
+    .emergency-meta {
+      display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;
+    }
+    .meta-item { font-size: .875rem; color: rgba(255,255,255,.6); display: flex; align-items: center; gap: .4rem; }
+    .meta-item svg { width: .875rem; height: .875rem; color: rgba(255,255,255,.4); }
+
+    .steps-section { padding: 5rem 2rem; background: var(--bg); }
+    .steps-inner { max-width: 760px; margin: 0 auto; }
+    .steps-title { font-size: clamp(1.5rem,3vw,2rem); font-weight: 900; color: var(--navy); margin: 0 0 2rem; text-align: center; }
+    .steps-list { display: flex; flex-direction: column; gap: 1.25rem; }
+    .step { display: flex; gap: 1.25rem; align-items: flex-start; }
+    .step-num {
+      width: 2.25rem; height: 2.25rem; border-radius: 50%; background: var(--blue); color: #fff;
+      font-size: .875rem; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .step h3 { font-size: 1rem; font-weight: 800; color: var(--navy); margin: 0 0 .25rem; }
+    .step p { font-size: .9rem; color: var(--muted); margin: 0; line-height: 1.55; }
+
+    .cta-strip {
+      background: var(--blue); color: #fff; padding: 4rem 2rem; text-align: center;
+    }
+    .cta-strip h2 { font-size: clamp(1.5rem,4vw,2.5rem); font-weight: 900; margin: 0 0 1rem; }
+    .cta-strip p { color: rgba(255,255,255,.8); margin: 0 0 2rem; }
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: #fff; color: var(--blue); padding: 1rem 2.25rem; border-radius: .75rem;
+      font-size: 1.05rem; font-weight: 700; text-decoration: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,.15); transition: opacity .2s, transform .15s;
+    }
+    .cta-btn:hover { opacity: .9; transform: translateY(-2px); }
+  </style>
+
+  <div class="emergency-hero">
+    <div class="emergency-badge">24/7 Spoeddienst</div>
+    <h1>Spoedgeval?<br />Wij komen naar u toe.</h1>
+    <p>Bel ons direct — een gecertificeerde vakman staat voor u klaar, dag en nacht, ook in het weekend.</p>
+    <div class="emergency-cta">
+      <a href={`tel:${phone}`} class="btn-emergency">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 1.04h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 15.92z"/></svg>
+        Bel Nu — {client.brand.phone}
+      </a>
+    </div>
+    <div class="emergency-meta">
+      <span class="meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Gemiddeld {client.trustItems[0]?.value} ter plaatse</span>
+      <span class="meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Vaste prijs, geen verrassingen</span>
+      <span class="meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> 24/7 beschikbaar</span>
+    </div>
+  </div>
+
+  <section class="steps-section">
+    <div class="steps-inner">
+      <h2 class="steps-title">Wat te doen bij een spoedgeval</h2>
+      <div class="steps-list">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>
+            <h3>Sluit de hoofdkraan af</h3>
+            <p>Bij waterlekkage: draai de hoofdkraan dicht bij de meterkast. Dit voorkomt verdere schade terwijl u wacht.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>
+            <h3>Bel ons direct</h3>
+            <p>Leg het probleem kort uit — onze dispatcher stuurt meteen de dichtstbijzijnde beschikbare vakman naar u toe.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>
+            <h3>Ontvang een vaste prijsofferte</h3>
+            <p>De vakman beoordeelt ter plaatse en geeft u een schriftelijke prijs vóór er iets begint. Geen verrassingen.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <FaqAccordion preview={true} />
+
+  <section class="cta-strip">
+    <h2>Klaar om te helpen</h2>
+    <p>Neem contact op — we regelen de rest.</p>
+    <a href={`tel:${phone}`} class="cta-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      Bel {client.brand.phone}
+    </a>
+  </section>
+</BaseLayout>

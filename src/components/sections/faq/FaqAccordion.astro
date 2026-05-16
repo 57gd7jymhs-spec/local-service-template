@@ -1,0 +1,97 @@
+---
+import { client } from '../../../config/client';
+
+interface Props {
+  preview?: boolean;
+}
+const { preview = false } = Astro.props;
+
+const items = preview ? client.faq.slice(0, 3) : client.faq;
+const hasFaqPage = client.pages.faq;
+---
+
+<style>
+.faq-section { padding:5rem 1.5rem; background:var(--bg); }
+.faq-list { max-width:720px;margin:0 auto; }
+.faq-item {
+  border-bottom:1px solid var(--border);
+}
+.faq-item:first-child { border-top:1px solid var(--border); }
+.faq-trigger {
+  width:100%;background:none;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:1.25rem 0;text-align:left;font-family:inherit;
+  font-size:1rem;font-weight:700;color:var(--navy);
+  transition:color .2s;
+}
+.faq-trigger:hover { color:var(--blue); }
+.faq-trigger svg { width:1.125rem;height:1.125rem;flex-shrink:0;color:var(--blue);transition:transform .3s var(--ease); }
+.faq-item.open .faq-trigger svg { transform:rotate(45deg); }
+.faq-body {
+  overflow:hidden;max-height:0;transition:max-height .35s var(--ease);
+}
+.faq-item.open .faq-body { max-height:300px; }
+.faq-body p {
+  font-size:.9375rem;color:var(--muted);line-height:1.7;padding:0 0 1.25rem;margin:0;
+}
+.faq-footer { text-align:center;margin-top:2.5rem; }
+.faq-more-link {
+  display:inline-flex;align-items:center;gap:.5rem;
+  font-size:.9375rem;font-weight:600;color:var(--blue);text-decoration:none;
+  transition:gap .2s;
+}
+.faq-more-link:hover { gap:.75rem; }
+.faq-more-link svg { width:.875rem;height:.875rem; }
+</style>
+
+<section class="faq-section" id="faq">
+  <div class="wrap">
+    <div class="section-header" data-reveal>
+      <span class="eyebrow">FAQ</span>
+      <h2>Veelgestelde vragen</h2>
+    </div>
+    <div class="faq-list" role="list">
+      {items.map((item, i) => (
+        <div class="faq-item" role="listitem" data-reveal data-delay={String(i + 1)}>
+          <button class="faq-trigger" aria-expanded="false">
+            {item.question}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <div class="faq-body" aria-hidden="true">
+            <p>{item.answer}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+    {preview && hasFaqPage && (
+      <div class="faq-footer" data-reveal>
+        <a href="/faq" class="faq-more-link">
+          Alle vragen bekijken
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    )}
+  </div>
+</section>
+
+<script>
+document.querySelectorAll<HTMLElement>('.faq-item').forEach(item => {
+  const trigger = item.querySelector<HTMLButtonElement>('.faq-trigger');
+  const body = item.querySelector<HTMLElement>('.faq-body');
+  if (!trigger || !body) return;
+  trigger.addEventListener('click', () => {
+    const isOpen = item.classList.contains('open');
+    // Close all others
+    document.querySelectorAll('.faq-item.open').forEach(el => {
+      el.classList.remove('open');
+      el.querySelector<HTMLButtonElement>('.faq-trigger')?.setAttribute('aria-expanded', 'false');
+      el.querySelector<HTMLElement>('.faq-body')?.setAttribute('aria-hidden', 'true');
+    });
+    if (!isOpen) {
+      item.classList.add('open');
+      trigger.setAttribute('aria-expanded', 'true');
+      body.setAttribute('aria-hidden', 'false');
+    }
+  });
+});
+</script>

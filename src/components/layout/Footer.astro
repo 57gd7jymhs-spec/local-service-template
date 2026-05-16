@@ -31,7 +31,7 @@ footer { background:#0A1540;padding:3.5rem 1.5rem 2rem; }
           </div>
           {client.brand.name}
         </div>
-        <div class="footer-tagline">Gecertificeerde loodgieters — {client.brand.location} &amp; omgeving</div>
+        <div class="footer-tagline">{client.brand.tagline} — {client.brand.location} &amp; omgeving</div>
       </div>
       <div class="footer-cols">
         <div class="footer-col">
@@ -42,9 +42,7 @@ footer { background:#0A1540;padding:3.5rem 1.5rem 2rem; }
         </div>
         <div class="footer-col">
           <span class="footer-col-title">Openingstijden</span>
-          <p>Ma – Vr: 07:00 – 20:00</p>
-          <p>Za – Zo: 08:00 – 18:00</p>
-          <p class="emergency">Spoed: 24/7</p>
+          <p>{client.footer.hours}</p>
         </div>
         <div class="footer-col">
           <span class="footer-col-title">Diensten</span>
@@ -59,7 +57,7 @@ footer { background:#0A1540;padding:3.5rem 1.5rem 2rem; }
       <div class="footer-legal-row">
         <span class="footer-legal">Gecertificeerd &amp; verzekerd</span>
         <span class="footer-legal">Vaste prijs garantie</span>
-        <span class="footer-legal">BTW BE 0000.000.000</span>
+        <span class="footer-legal">BTW {client.footer.vatNumber}</span>
       </div>
     </div>
   </div>
