@@ -79,9 +79,13 @@ Open `http://localhost:4321` and check every section.
    - **Build command:** `npm run build`
    - **Build output directory:** `dist`
    - **Root directory:** *(leave blank)*
-4. Add environment variable in Settings → Variables:
-   - Name: `GROQ_API_KEY` — Type: **Secret** — Value: your Groq API key
-5. Deploy
+4. Add the Node.js compat flag in **Settings → Functions → Compatibility flags**:
+   ```
+   nodejs_compat
+   ```
+5. Add the AI key in **Settings → Environment variables** (type: **Secret**):
+   - `GROQ_API_KEY` → your Groq API key from [console.groq.com](https://console.groq.com)
+6. Deploy
 
 Your site is live at `project-name.pages.dev`.
 
@@ -208,6 +212,12 @@ ai: {
 ```
 
 Set `ai.enabled: false` to hide the chatbot entirely.
+
+---
+
+## Local admin panel
+
+In dev mode only, navigate to `/admin` to edit config fields visually and save directly to `src/config/client.ts`. The endpoint is locked in production — Cloudflare returns 403.
 
 ---
 

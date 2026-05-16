@@ -183,7 +183,7 @@ export const client = {
     { icon: "clock",  value: "45 min",  label: "Gemiddelde aankomsttijd" },
     { icon: "users",  value: "4.800+",  label: "Tevreden klanten" },
     { icon: "badge",  value: "15 jr",   label: "Gecertificeerde ervaring" },
-    { icon: "bolt",   value: "24/7",    label: "Bereikbaar" },
+    { icon: "check",  value: "Gratis",  label: "Als het niet lukt — onze garantie" },
   ],
 
   // ── Info card ─────────────────────────────────────────────────────────
@@ -258,12 +258,25 @@ export const client = {
 
   // ── Testimonials ──────────────────────────────────────────────────────
   // Drives TestimonialsRow + TestimonialsCarousel.
+  // aggregate: drives the rating box in the reviews section
+  reviewAggregate: {
+    score:    "4.9",
+    count:    "320+",
+    platforms: [
+      { name: "Google",     score: "4.9", pct: "96%" },
+      { name: "Facebook",   score: "4.8", pct: "92%" },
+      { name: "Trustpilot", score: "5.0", pct: "98%" },
+    ],
+    heading: "320+ tevreden klanten\nin de regio Brugge.",
+    eyebrow: "Wat klanten zeggen",
+  },
+
   testimonials: [
-    { name: "Jan De Smet",       rating: 5, text: "Binnen het uur ter plaatse, professioneel en propere afwerking. Aanrader!",                               location: "Brugge" },
-    { name: "Sarah Vermeersch",  rating: 5, text: "Lekkende kraan op zaterdagavond — in minder dan 45 minuten opgelost. Top service!",                      location: "Damme" },
-    { name: "Marc Claeys",       rating: 5, text: "Duidelijke uitleg, eerlijke prijs en geen rommel achtergelaten. Zeker terugkomen.",                       location: "Brugge" },
-    { name: "Lien Vermeulen",    rating: 5, text: "Verstopte afvoer midden in de nacht. Ze waren er binnen 40 minuten. Ongelooflijk snel.",                  location: "Oostende" },
-    { name: "Peter Janssens",    rating: 5, text: "Vaste prijs vooraf, geen verrassingen achteraf. Zo hoort het te werken.",                                 location: "Brugge" },
+    { name: "Lore V.",         rating: 5, text: "Om 23u gebeld wegens een gesprongen pijp. Loodgieter was er na 40 minuten. Kalm, professioneel, opgelost in twee uur. Prijs exact zoals afgesproken. Ik bel nooit iemand anders.",                location: "Brugge · Noodoproep" },
+    { name: "Pieter D.",       rating: 5, text: "Drie andere bedrijven hadden het lek niet gevonden. Dropwork vond het in 20 minuten met een sensor. Zelfde dag hersteld. Ongelooflijk vakwerk.",                                                    location: "Gent · Lekdetectie" },
+    { name: "Marie-Claire W.", rating: 5, text: "Onze ketel viel uit op Kerstavond. Ze namen meteen op, waren eerlijk dat het mogelijk de volgende ochtend zou zijn, en stonden om 7u aan de deur. Opgelost voor de middag.",                       location: "Brugge · Ketelreparatie" },
+    { name: "Thomas B.",       rating: 5, text: "Heel netjes en snel gewerkt. Vloerprotectie gelegd voor ze begonnen, alles opgeruimd achteraf. De prijs was exact wat ze telefonisch hadden gezegd.",                                              location: "Kortrijk · Badkamer" },
+    { name: "Saar M.",         rating: 5, text: "Oprecht verbaasd over hoe professioneel dit verliep. Twee eerdere loodgieters waren te laat, vaag over prijs en lieten een bende achter. Dit was precies het tegenovergestelde.",                   location: "Brugge · Afvoer" },
   ],
 
   // ── Stats ─────────────────────────────────────────────────────────────

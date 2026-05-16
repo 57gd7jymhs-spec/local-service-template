@@ -1,0 +1,499 @@
+---
+// Dev-only admin dashboard — redirects in production
+if (!import.meta.env.DEV) {
+  return Astro.redirect('/');
+}
+
+import { client } from '../config/client';
+
+const c = client;
+const servicesJson = JSON.stringify(c.services, null, 2);
+const trustJson    = JSON.stringify(c.trustItems, null, 2);
+const faqJson      = JSON.stringify(c.faq, null, 2);
+const navJson      = JSON.stringify(c.nav, null, 2);
+const marqueeJson  = JSON.stringify(c.marqueeItems, null, 2);
+---
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin — {c.brand.name}</title>
+  <link rel="stylesheet" href="/admin.css" />
+  <style is:global></style>
+</head>
+<body>
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        <span class="sidebar-title">Site Admin</span>
+      </div>
+      <span class="sidebar-badge">DEV</span>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab active" data-tab="brand">Brand</button>
+      <button class="tab" data-tab="colors">Kleuren</button>
+      <button class="tab" data-tab="hero">Hero</button>
+      <button class="tab" data-tab="services">Diensten</button>
+      <button class="tab" data-tab="layout">Layout</button>
+      <button class="tab" data-tab="content">Content</button>
+      <button class="tab" data-tab="seo">SEO</button>
+    </div>
+
+    <div class="tab-content">
+
+      <!-- BRAND TAB -->
+      <div class="tab-panel active" id="tab-brand">
+        <div class="section-label">Bedrijfsinfo</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Naam</label>
+            <input id="brandName" value={c.brand.name} />
+          </div>
+          <div class="field">
+            <label>Tagline</label>
+            <input id="brandTagline" value={c.brand.tagline} />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Niche</label>
+            <select id="brandNiche">
+              {(['plumber','barber','roofer','electrician','generic'] as const).map(n => (
+                <option value={n} selected={c.brand.niche === n}>{n}</option>
+              ))}
+            </select>
+          </div>
+          <div class="field">
+            <label>Stad</label>
+            <input id="brandLocation" value={c.brand.location} />
+          </div>
+        </div>
+        <div class="field">
+          <label>Telefoon</label>
+          <input id="brandPhone" value={c.brand.phone} placeholder="+32 500 00 00" />
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input id="brandEmail" value={c.brand.email} />
+        </div>
+        <div class="section-label">Logo</div>
+        <div class="field">
+          <label>Logo (donker)</label>
+          <input id="brandLogo" value={c.brand.logo} placeholder="/images/logo.png" />
+          <p class="field-hint">Voor nav default state (op witte achtergrond)</p>
+        </div>
+        <div class="field">
+          <label>Logo (wit)</label>
+          <input id="brandLogoNeg" value={c.brand.logoNegative} placeholder="/images/logo-negative.png" />
+          <p class="field-hint">Voor donkere achtergronden en nav na scrollen</p>
+        </div>
+        <div class="section-label">Footer</div>
+        <div class="field">
+          <label>Openingstijden</label>
+          <input id="footerHours" value={c.footer.hours} />
+        </div>
+        <div class="field">
+          <label>BTW-nummer</label>
+          <input id="footerVat" value={c.footer.vatNumber} />
+        </div>
+      </div>
+
+      <!-- COLORS TAB -->
+      <div class="tab-panel" id="tab-colors">
+        <div class="section-label">Merkskleuren</div>
+        <div class="field">
+          <label>Primaire kleur (blauw)</label>
+          <div class="color-row">
+            <input type="color" class="color-picker" id="colorPrimaryPicker" value={c.theme.primary} />
+            <input class="color-hex" id="colorPrimary" value={c.theme.primary} placeholder="#1847ED" />
+          </div>
+          <p class="field-hint">Knoppen, links, accenten</p>
+        </div>
+        <div class="field">
+          <label>Donkerblauwe kleur (navy)</label>
+          <div class="color-row">
+            <input type="color" class="color-picker" id="colorNavyPicker" value={c.theme.navy} />
+            <input class="color-hex" id="colorNavy" value={c.theme.navy} placeholder="#0D1E5C" />
+          </div>
+          <p class="field-hint">Nav na scrollen, CTA banner, hero achtergrond</p>
+        </div>
+        <div class="section-label">Achtergrondfondsen</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Pagina BG</label>
+            <div class="color-row">
+              <input type="color" class="color-picker" id="colorBgPicker" value={c.theme.bg} />
+              <input class="color-hex" id="colorBg" value={c.theme.bg} />
+            </div>
+          </div>
+          <div class="field">
+            <label>Card BG</label>
+            <div class="color-row">
+              <input type="color" class="color-picker" id="colorSurfacePicker" value={c.theme.surface} />
+              <input class="color-hex" id="colorSurface" value={c.theme.surface} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HERO TAB -->
+      <div class="tab-panel" id="tab-hero">
+        <div class="section-label">Hero variant</div>
+        <div class="field">
+          <label>Type hero</label>
+          <div class="variant-group" id="heroVariantGroup">
+            {(['video','split','minimal'] as const).map(v => (
+              <button class={`variant-btn${c.pages.home.hero === v ? ' selected' : ''}`} data-val={v}>
+                {v === 'video' ? '▶ Video' : v === 'split' ? '⬛ Split' : '✦ Minimal'}
+              </button>
+            ))}
+          </div>
+          <input type="hidden" id="heroVariant" value={c.pages.home.hero} />
+          <p class="field-hint">Video = looping clip | Split = foto links | Minimal = alleen tekst</p>
+        </div>
+        <div class="section-label">Tekst</div>
+        <div class="field">
+          <label>Koptekst (eerste deel)</label>
+          <input id="heroHeadline" value={c.hero.headline} />
+          <p class="field-hint">Bv. "Problemen met"</p>
+        </div>
+        <div class="field">
+          <label>Roterende woorden</label>
+          <input id="heroWords" value={c.hero.rotatingWords.join(', ')} />
+          <p class="field-hint">Kommagescheiden: lekken, verstoppingen, toiletten</p>
+        </div>
+        <div class="field">
+          <label>Subtekst</label>
+          <textarea id="heroSubtext">{c.hero.subtext}</textarea>
+        </div>
+        <div class="field">
+          <label>CTA knoptekst</label>
+          <input id="heroCtaLabel" value={c.hero.ctaLabel} />
+        </div>
+        <div class="field">
+          <label>Vertrouwensbadge tekst</label>
+          <input id="heroTrustBadge" value={c.hero.trustBadge} />
+        </div>
+      </div>
+
+      <!-- SERVICES TAB -->
+      <div class="tab-panel" id="tab-services">
+        <div class="section-label">Diensten (JSON)</div>
+        <div class="field">
+          <label>Diensten array</label>
+          <textarea id="servicesJson" style="min-height:300px">{servicesJson}</textarea>
+          <p class="field-hint">icon: droplet | drain | flame | wrench | scissors | home | zap | tool</p>
+        </div>
+        <div class="section-label">Sectie koptekst</div>
+        <div class="field">
+          <label>Eyebrow</label>
+          <input id="svcEyebrow" value={c.sections.services.eyebrow} />
+        </div>
+        <div class="field">
+          <label>Koptekst</label>
+          <input id="svcHeading" value={c.sections.services.heading} />
+        </div>
+        <div class="field">
+          <label>Subtekst</label>
+          <textarea id="svcSubtext" style="min-height:60px">{c.sections.services.subtext}</textarea>
+        </div>
+        <div class="section-label">Trust strip</div>
+        <div class="field">
+          <label>4 Statistieken (JSON)</label>
+          <textarea id="trustJson" style="min-height:160px">{trustJson}</textarea>
+          <p class="field-hint">icon: clock | users | badge | bolt | check | star | shield</p>
+        </div>
+      </div>
+
+      <!-- LAYOUT TAB -->
+      <div class="tab-panel" id="tab-layout">
+        <div class="section-label">Sectievarianten</div>
+        <div class="field">
+          <label>Diensten layout</label>
+          <div class="variant-group" id="svcVariantGroup">
+            {(['grid','list'] as const).map(v => (
+              <button class={`variant-btn${c.sections.services.variant === v ? ' selected' : ''}`} data-val={v}>
+                {v === 'grid' ? '⊞ Grid (kaarten)' : '☰ Lijst (rijen)'}
+              </button>
+            ))}
+          </div>
+          <input type="hidden" id="svcVariant" value={c.sections.services.variant} />
+        </div>
+        <div class="field">
+          <label>Testimonials layout</label>
+          <div class="variant-group" id="testVariantGroup">
+            {(['row','carousel'] as const).map(v => (
+              <button class={`variant-btn${c.sections.testimonials.variant === v ? ' selected' : ''}`} data-val={v}>
+                {v === 'row' ? '⊡ Marquee rij' : '▷ Carrousel'}
+              </button>
+            ))}
+          </div>
+          <input type="hidden" id="testVariant" value={c.sections.testimonials.variant} />
+        </div>
+        <div class="field">
+          <label>CTA sectie</label>
+          <div class="variant-group" id="ctaVariantGroup">
+            {(['banner','split'] as const).map(v => (
+              <button class={`variant-btn${c.sections.cta.variant === v ? ' selected' : ''}`} data-val={v}>
+                {v === 'banner' ? '⬤ Banner' : '⬛ Split (foto+tekst)'}
+              </button>
+            ))}
+          </div>
+          <input type="hidden" id="ctaVariant" value={c.sections.cta.variant} />
+        </div>
+        <div class="section-label">CTA tekst</div>
+        <div class="field">
+          <label>CTA koptekst</label>
+          <input id="ctaHeading" value={c.sections.cta.heading} />
+        </div>
+        <div class="field">
+          <label>CTA subtekst</label>
+          <textarea id="ctaSubtext" style="min-height:60px">{c.sections.cta.subtext}</textarea>
+        </div>
+        <div class="field">
+          <label>CTA knoptekst</label>
+          <input id="ctaLabel" value={c.sections.cta.ctaLabel} />
+        </div>
+        <div class="section-label">Navigatie links (JSON)</div>
+        <div class="field">
+          <label>Nav links</label>
+          <textarea id="navJson" style="min-height:120px">{navJson}</textarea>
+        </div>
+        <div class="section-label">Marquee band</div>
+        <div class="field">
+          <label>Marquee items (JSON array)</label>
+          <textarea id="marqueeJson" style="min-height:100px">{marqueeJson}</textarea>
+        </div>
+      </div>
+
+      <!-- CONTENT TAB -->
+      <div class="tab-panel" id="tab-content">
+        <div class="section-label">Reviews aggregate</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Score</label>
+            <input id="aggScore" value={c.reviewAggregate.score} />
+          </div>
+          <div class="field">
+            <label>Aantal</label>
+            <input id="aggCount" value={c.reviewAggregate.count} />
+          </div>
+        </div>
+        <div class="field">
+          <label>Reviews koptekst</label>
+          <textarea id="aggHeading" style="min-height:60px">{c.reviewAggregate.heading}</textarea>
+          <p class="field-hint">Gebruik \n voor een regelafbreking</p>
+        </div>
+        <div class="section-label">FAQ</div>
+        <div class="field">
+          <label>FAQ vragen (JSON)</label>
+          <textarea id="faqJson" style="min-height:300px">{faqJson}</textarea>
+        </div>
+        <div class="section-label">WhyUs</div>
+        <div class="field">
+          <label>WhyUs eyebrow</label>
+          <input id="whyEyebrow" value={c.sections.whyUs.eyebrow} />
+        </div>
+        <div class="field">
+          <label>WhyUs koptekst</label>
+          <input id="whyHeading" value={c.sections.whyUs.heading} />
+        </div>
+        <div class="field">
+          <label>WhyUs subtekst</label>
+          <textarea id="whySubtext" style="min-height:60px">{c.sections.whyUs.subtext}</textarea>
+        </div>
+      </div>
+
+      <!-- SEO TAB -->
+      <div class="tab-panel" id="tab-seo">
+        <div class="section-label">Zoekmachines</div>
+        <div class="field">
+          <label>Paginatitel</label>
+          <input id="seoTitle" value={c.seo.title} />
+          <p class="field-hint">Wordt getoond in de browsertab en Google resultaten</p>
+        </div>
+        <div class="field">
+          <label>Meta beschrijving</label>
+          <textarea id="seoDesc" style="min-height:80px">{c.seo.description}</textarea>
+          <p class="field-hint">Max ±155 tekens voor Google</p>
+        </div>
+        <div class="field">
+          <label>Locale</label>
+          <select id="seoLocale">
+            <option value="nl" selected={c.seo.locale === 'nl'}>nl (Nederlands)</option>
+            <option value="fr" selected={c.seo.locale === 'fr'}>fr (Frans)</option>
+            <option value="en" selected={c.seo.locale === 'en'}>en (Engels)</option>
+          </select>
+        </div>
+        <div class="section-label">AI chatbot</div>
+        <div class="field">
+          <label>AI model</label>
+          <input id="aiModel" value={c.ai.model} />
+        </div>
+        <div class="field">
+          <label>Systeem prompt</label>
+          <textarea id="aiPrompt" style="min-height:200px">{c.ai.systemPrompt}</textarea>
+        </div>
+      </div>
+
+    </div><!-- /tab-content -->
+
+    <div class="sidebar-foot">
+      <button class="save-btn" id="saveBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Opslaan &amp; Preview
+      </button>
+      <div class="save-status" id="saveStatus"></div>
+    </div>
+  </aside>
+
+  <!-- PREVIEW -->
+  <div id="preview">
+    <div class="preview-bar">
+      <label>Pagina:</label>
+      <select id="previewPage" onchange="document.getElementById('previewFrame').src = this.value">
+        <option value="/">Homepage</option>
+        <option value="/over-ons">Over ons</option>
+        <option value="/diensten">Diensten</option>
+        <option value="/contact">Contact</option>
+      </select>
+      <div class="preview-url" id="previewUrl">http://localhost:4321/</div>
+      <button class="preview-reload" onclick="document.getElementById('previewFrame').src = document.getElementById('previewFrame').src">↺ Herladen</button>
+    </div>
+    <iframe id="previewFrame" src="/" title="Site preview"></iframe>
+  </div>
+</div>
+
+<script is:inline>
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    const id = tab.dataset.tab;
+    document.getElementById('tab-' + id)?.classList.add('active');
+  });
+});
+
+// Variant button groups
+document.querySelectorAll('.variant-group').forEach(group => {
+  const hidden = group.nextElementSibling;
+  group.querySelectorAll('.variant-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      group.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      if (hidden?.tagName === 'INPUT') hidden.value = btn.dataset.val;
+    });
+  });
+});
+
+// Color picker sync
+function syncColor(pickerId, hexId) {
+  const picker = document.getElementById(pickerId);
+  const hex = document.getElementById(hexId);
+  if (!picker || !hex) return;
+  picker.addEventListener('input', () => { hex.value = picker.value; });
+  hex.addEventListener('input', () => {
+    if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) picker.value = hex.value;
+  });
+}
+syncColor('colorPrimaryPicker','colorPrimary');
+syncColor('colorNavyPicker','colorNavy');
+syncColor('colorBgPicker','colorBg');
+syncColor('colorSurfacePicker','colorSurface');
+
+// Preview page select
+document.getElementById('previewPage')?.addEventListener('change', function() {
+  document.getElementById('previewUrl').textContent = 'http://localhost:4321' + this.value;
+});
+
+// Save
+document.getElementById('saveBtn')?.addEventListener('click', async () => {
+  const btn = document.getElementById('saveBtn');
+  const status = document.getElementById('saveStatus');
+  btn.disabled = true;
+  btn.textContent = 'Opslaan...';
+  status.className = 'save-status';
+  status.textContent = '';
+
+  function val(id) { return document.getElementById(id)?.value ?? ''; }
+  function json(id) {
+    try { return JSON.parse(document.getElementById(id)?.value ?? '[]'); }
+    catch(e) { throw new Error('Ongeldige JSON in ' + id); }
+  }
+
+  try {
+    const payload = {
+      brand: {
+        name: val('brandName'), tagline: val('brandTagline'),
+        niche: val('brandNiche'), phone: val('brandPhone'),
+        email: val('brandEmail'), location: val('brandLocation'),
+        logo: val('brandLogo'), logoNegative: val('brandLogoNeg'),
+      },
+      theme: {
+        primary: val('colorPrimary'), navy: val('colorNavy'),
+        bg: val('colorBg'), surface: val('colorSurface'),
+      },
+      hero: {
+        variant: val('heroVariant'),
+        headline: val('heroHeadline'),
+        rotatingWords: val('heroWords').split(',').map(w => w.trim()).filter(Boolean),
+        subtext: val('heroSubtext'),
+        ctaLabel: val('heroCtaLabel'),
+        trustBadge: val('heroTrustBadge'),
+      },
+      services: json('servicesJson'),
+      sections: {
+        services:     { variant: val('svcVariant'),  eyebrow: val('svcEyebrow'), heading: val('svcHeading'), subtext: val('svcSubtext') },
+        testimonials: { variant: val('testVariant'),  eyebrow: val('aggHeading').split('\n')[0] },
+        cta:          { variant: val('ctaVariant'),   heading: val('ctaHeading'), subtext: val('ctaSubtext'), ctaLabel: val('ctaLabel') },
+        whyUs:        { eyebrow: val('whyEyebrow'),  heading: val('whyHeading'), subtext: val('whySubtext') },
+      },
+      trustItems:  json('trustJson'),
+      nav:         json('navJson'),
+      marqueeItems: json('marqueeJson'),
+      reviewAggregate: {
+        score: val('aggScore'), count: val('aggCount'),
+        heading: val('aggHeading'),
+      },
+      faq: json('faqJson'),
+      footer: { hours: val('footerHours'), vatNumber: val('footerVat') },
+      seo: { title: val('seoTitle'), description: val('seoDesc'), locale: val('seoLocale') },
+      ai: { model: val('aiModel'), systemPrompt: val('aiPrompt') },
+    };
+
+    const res = await fetch('/api/admin-save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || 'Onbekende fout');
+
+    status.className = 'save-status ok';
+    status.textContent = '✓ Opgeslagen! Preview wordt herladen...';
+    setTimeout(() => {
+      const frame = document.getElementById('previewFrame');
+      frame.src = frame.src;
+    }, 800);
+  } catch(err) {
+    status.className = 'save-status err';
+    status.textContent = '✗ ' + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Opslaan & Preview`;
+  }
+});
+</script>
+</body>
+</html>

@@ -1,66 +1,100 @@
 ---
 import { client } from '../../../config/client';
+
+const agg   = client.reviewAggregate;
+const items = client.testimonials;
 ---
 
 <style>
-  .reviews { padding: 6rem 2rem; background: var(--surface); }
-  .section-header { text-align: center; max-width: 560px; margin: 0 auto 3rem; }
-  .section-label { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--blue); margin-bottom: .75rem; }
-  .section-title { font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 900; color: var(--ink); letter-spacing: -.03em; line-height: 1.1; margin: 0; }
-  .grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.25rem; max-width: 1200px; margin: 0 auto;
-  }
-  .card {
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 1.75rem;
-  }
-  .stars { color: #f59e0b; font-size: 1rem; margin-bottom: .75rem; letter-spacing: .05em; }
-  .quote { font-size: .925rem; color: var(--ink); line-height: 1.6; margin: 0 0 1.25rem; font-style: italic; }
-  .reviewer { display: flex; align-items: center; gap: .75rem; }
-  .avatar {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: var(--blue); color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-size: .8rem; font-weight: 800;
-  }
-  .reviewer-name { font-size: .875rem; font-weight: 700; color: var(--ink); }
-  .reviewer-loc  { font-size: .75rem; color: var(--muted); }
-  .stats-row {
-    display: flex; justify-content: center; gap: 3rem; margin-top: 3.5rem;
-    flex-wrap: wrap;
-  }
-  .stat { text-align: center; }
-  .stat-value { font-size: 2rem; font-weight: 900; color: var(--blue); letter-spacing: -.04em; }
-  .stat-label { font-size: .8rem; color: var(--muted); margin-top: .2rem; }
+.reviews-section { padding:4rem 0;background:var(--bg);overflow:hidden; }
+.reviews-section .wrap { padding:0 1.5rem; }
+.aggregate {
+  display:flex;align-items:center;gap:3rem;flex-wrap:wrap;margin-bottom:2.5rem;
+  padding:2rem;background:#fff;border-radius:1.25rem;border:1px solid var(--border);
+  box-shadow:0 2px 12px rgba(0,0,0,.04);
+}
+.agg-score-big { font-size:4rem;font-weight:900;color:var(--navy);letter-spacing:-.04em;line-height:1; }
+.agg-stars { color:#FBBF24;font-size:1.25rem;letter-spacing:.1em;margin:.25rem 0; }
+.agg-count { font-size:.875rem;color:var(--muted); }
+.platform-rows { flex:1;min-width:200px;display:flex;flex-direction:column;gap:.875rem; }
+.platform-row { display:flex;align-items:center;gap:.875rem; }
+.platform-name { width:5rem;font-size:.8125rem;font-weight:600;color:var(--ink);flex-shrink:0; }
+.platform-bar-bg { flex:1;height:.5rem;background:var(--border);border-radius:9999px;overflow:hidden; }
+.platform-bar { height:100%;background:var(--blue);border-radius:9999px;transition:width 1.2s var(--ease);width:0; }
+.platform-score { width:2rem;text-align:right;font-size:.8125rem;font-weight:700;color:var(--navy); }
+.reviews-marquee { margin-top:2.5rem;overflow:hidden; }
+.reviews-track { display:flex;gap:1.5rem;animation:reviewScroll 40s linear infinite;width:max-content; }
+.reviews-track:hover { animation-play-state:paused; }
+.review-card {
+  flex-shrink:0;width:20rem;background:#fff;border-radius:1.25rem;
+  border:1px solid var(--border);padding:1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+.review-stars { color:#FBBF24;font-size:1rem;letter-spacing:.05em;margin-bottom:.875rem; }
+.review-text { font-size:.9375rem;color:var(--ink);line-height:1.65;margin-bottom:1rem; }
+.review-author { display:flex;flex-direction:column;gap:.125rem; }
+.review-author strong { font-size:.875rem;font-weight:700;color:var(--navy); }
+.review-author span { font-size:.8125rem;color:var(--muted); }
+@keyframes reviewScroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+@media(max-width:640px){
+  .reviews-section { padding:2.5rem 0; }
+  .aggregate { padding:1.25rem;gap:1.5rem; }
+  .agg-score-big { font-size:2.75rem; }
+  .reviews-section .section-header { margin-bottom:2rem; }
+}
 </style>
 
-<section class="reviews" id="reviews">
-  <div class="section-header">
-    <div class="section-label">{client.sections.testimonials.eyebrow}</div>
-    <h2 class="section-title">{client.sections.testimonials.heading}</h2>
+<section class="reviews-section" id="reviews">
+  <div class="wrap">
+    <div class="section-header" data-reveal>
+      <span class="eyebrow">{agg.eyebrow}</span>
+      <h2 set:html={agg.heading.replace('\n', '<br>')}></h2>
+    </div>
+    <div class="aggregate" data-reveal>
+      <div>
+        <div class="agg-score-big">{agg.score}</div>
+        <div class="agg-stars">★★★★★</div>
+        <div class="agg-count">Uit {agg.count} geverifieerde beoordelingen</div>
+      </div>
+      <div class="platform-rows">
+        {agg.platforms.map(p => (
+          <div class="platform-row">
+            <span class="platform-name">{p.name}</span>
+            <div class="platform-bar-bg">
+              <div class="platform-bar" data-width={p.pct}></div>
+            </div>
+            <span class="platform-score">{p.score}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   </div>
-  <div class="grid">
-    {client.testimonials.map(t => (
-      <div class="card">
-        <div class="stars">{'★'.repeat(t.rating)}</div>
-        <p class="quote">"{t.text}"</p>
-        <div class="reviewer">
-          <div class="avatar">{t.name.charAt(0)}</div>
-          <div>
-            <div class="reviewer-name">{t.name}</div>
-            <div class="reviewer-loc">{t.location}</div>
+
+  <div class="reviews-marquee">
+    <div class="reviews-track">
+      {[...items, ...items].map(t => (
+        <div class="review-card">
+          <div class="review-stars">{'★'.repeat(t.rating)}</div>
+          <p class="review-text">"{t.text}"</p>
+          <div class="review-author">
+            <strong>{t.name}</strong>
+            <span>{t.location}</span>
           </div>
         </div>
-      </div>
-    ))}
-  </div>
-  <div class="stats-row">
-    {client.stats.map(s => (
-      <div class="stat">
-        <div class="stat-value">{s.value}</div>
-        <div class="stat-label">{s.label}</div>
-      </div>
-    ))}
+      ))}
+    </div>
   </div>
 </section>
+
+<script>
+// Animate platform bars when they enter viewport
+const barObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.querySelectorAll<HTMLElement>('.platform-bar[data-width]').forEach(bar => {
+      bar.style.width = bar.dataset.width ?? '0%';
+    });
+    barObs.unobserve(e.target);
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.aggregate').forEach(el => barObs.observe(el));
+</script>

@@ -10,6 +10,11 @@ export default defineConfig({
   adapter: cloudflare(),
 
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    ssr: {
+      // node:fs and node:path are used dev-only in admin-save.ts
+      // nodejs_compat in wrangler.toml makes them available at runtime
+      external: ['node:fs', 'node:path'],
+    },
   }
 });
